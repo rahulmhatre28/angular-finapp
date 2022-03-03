@@ -1,0 +1,91 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Blank Page</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Blank Page</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Default box -->
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Title</h3>
+
+                <div class="card-tools">
+                    <button
+                        type="button"
+                        class="btn btn-tool"
+                        data-widget="collapse"
+                        data-toggle="tooltip"
+                        title="Collapse"
+                    >
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-tool"
+                        data-widget="remove"
+                        data-toggle="tooltip"
+                        title="Remove"
+                    >
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <p-table [value]="sales" [scrollable]="true"  scrollHeight="400px" scrollDirection="both">
+                    <ng-template pTemplate="header">
+                        <tr >
+                            <th style="width:100px" rowspan="3">Brand</th>
+                            <th style="width:100px" colspan="4">Sale Rate</th>
+                        </tr>
+                        <tr>
+                            <th style="width:100px" colspan="2">Sales</th>
+                            <th style="width:100px" colspan="2">Profits</th>
+                        </tr>
+                        <tr>
+                            <th style="width:100px">Last Year</th>
+                            <th style="width:100px">This Year</th>
+                            <th style="width:100px">Last Year</th>
+                            <th style="width:100px">This Year</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-sale>
+                        <tr>
+                            <td style="width:100px">{{sale.brand}}</td>
+                            <td style="width:100px">{{sale.lastYearSale}}</td>
+                            <td style="width:100px">{{sale.thisYearSale}}</td>
+                            <td style="width:100px">{{sale.lastYearProfit}}</td>
+                            <td style="width:100px">{{sale.thisYearProfit}}</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="footer">
+                        <tr>
+                            <td style="width:100px" colspan="3">Totals</td>
+                            <td style="width:100px">$506,202</td>
+                            <td style="width:100px">$531,020</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">Footer</div>
+            <!-- /.card-footer-->
+        </div>
+    </div>
+    <!-- /.card -->
+</section>
+<!-- /.content -->

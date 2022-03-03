@@ -1,0 +1,197 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+<div class="card">
+    <div class="card-body">
+        <form [formGroup]="registerForm" (ngSubmit)="!registerForm.invalid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">Name</label>
+                        <span class="text-danger">*</span>
+                        <input
+                          formControlName="name"
+                          type="text"
+                          class="form-control"
+                          placeholder="Name"
+                        />
+                        <div class="col-12" *ngIf="f.name.touched && f.name.invalid">
+                            <small *ngIf="f.name.errors?.required" class="p-error">Name is required.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">Email</label>
+                        <span class="text-danger">*</span>
+                        <input
+                          formControlName="email"
+                          type="email"
+                          class="form-control"
+                          placeholder="Email"
+                        />
+                        <div class="col-12" *ngIf="f.email.touched && f.email.invalid">
+                            <small *ngIf="f.email.errors?.required" class="p-error">Email is required.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">Phone</label>
+                        <span class="text-danger">*</span>
+                        <input
+                          formControlName="phone"
+                          type="text"
+                          class="form-control"
+                          placeholder="Phone"
+                        />
+                        <div class="col-12" *ngIf="f.phone.touched && f.phone.invalid">
+                            <small *ngIf="f.phone.errors?.required" class="p-error">phone is required.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">PAN Card</label>
+                        <span class="text-danger">*</span>
+                        <input
+                          formControlName="pan"
+                          type="text"
+                          class="form-control"
+                          placeholder="PAN Card"
+                        />
+                        <div class="col-12" *ngIf="f.pan.touched && f.pan.invalid">
+                            <small *ngIf="f.pan.errors?.required" class="p-error">PAN is required.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">Pincode</label>
+                        <span class="text-danger">*</span>
+                        <input
+                          formControlName="pincode"
+                          type="text"
+                          class="form-control"
+                          placeholder="Pincode"
+                        />
+                        <div class="col-12" *ngIf="f.pincode.touched && f.pincode.invalid">
+                            <small *ngIf="f.pincode.errors?.required" class="p-error">Pincode is required.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="">GST No.</label>
+                        <span class="text-danger">*</span>
+                        <input
+                          formControlName="gst"
+                          type="text"
+                          class="form-control"
+                          placeholder="GST No."
+                        />
+                        <div class="col-12" *ngIf="f.gst.touched && f.gst.invalid">
+                            <small *ngIf="f.gst.errors?.required" class="p-error">GST No. is required.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>Bank Details</span>
+                            <span style="float:right"><button type="button" class="btn btn-primary btn-xs" (click)="addBank()">Add Bank</button></span>
+                        </div>
+                        <div class="card-body">
+                            <div *ngFor="let detail of bankFormGroups; let i = index">
+                                <div class="row" style="border-top:1px solid grey" *ngIf="i>0">
+                                    <div class="col-md-12 text-right pt-1">
+                                    <button type="button" class="btn btn-danger btn-xs" (click)="removeBank(i)"><i class="fa fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="row" [formGroup]="detail">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Bank Name</label>
+                                        <span class="text-danger">*</span>
+                                        <input
+                                          formControlName="bank"
+                                          type="text"
+                                          class="form-control"
+                                          placeholder="Bank Name"
+                                        />
+                                        <div class="col-12" *ngIf="detail.controls.bank.touched && detail.controls.bank.invalid">
+                                            <small *ngIf="detail.controls.bank.errors?.required" class="p-error">Bank Name is required.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Branch Name</label>
+                                        <span class="text-danger">*</span>
+                                        <input
+                                          formControlName="branchname"
+                                          type="text"
+                                          class="form-control"
+                                          placeholder="Branch Name"
+                                        />
+                                        <div class="col-12" *ngIf="detail.controls.branchname.touched && detail.controls.branchname.invalid">
+                                            <small *ngIf="detail.controls.branchname.errors?.required" class="p-error">Branch is required.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Account No.</label>
+                                        <span class="text-danger">*</span>
+                                        <input
+                                          formControlName="accountno"
+                                          type="text"
+                                          class="form-control"
+                                          placeholder="Account No."
+                                        />
+                                        <div class="col-12" *ngIf="detail.controls.accountno.touched && detail.controls.accountno.invalid">
+                                            <small *ngIf="detail.controls.accountno.errors?.required" class="p-error">Account No. is required.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">Account Type</label>
+                                        <span class="text-danger">*</span>
+                                        <select
+                                          formControlName="accounttype"
+                                          type="text"
+                                          class="form-control"
+                                        >
+                                            <option value="null">Select Account Type</option>
+                                            <option value="'Current'">Current</option>
+                                            <option value="'Saving'">Saving</option>
+                                            <option value="'Salaried'">Salaried</option>
+                                        </select>
+                                        <div class="col-12" *ngIf="detail.controls.accounttype.touched && detail.controls.accounttype.invalid">
+                                            <small *ngIf="detail.controls.accounttype.errors?.required" class="p-error">Account Type is required.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="">IFSC Code</label>
+                                        <span class="text-danger">*</span>
+                                        <input
+                                          formControlName="ifsccode"
+                                          type="text"
+                                          class="form-control"
+                                          placeholder="IFSC Code"
+                                        />
+                                        <div class="col-12" *ngIf="detail.controls.ifsccode.touched && detail.controls.ifsccode.invalid">
+                                            <small *ngIf="detail.controls.ifsccode.errors?.required" class="p-error">IFSC Code is required.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

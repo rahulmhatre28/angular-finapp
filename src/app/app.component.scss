@@ -1,0 +1,10 @@
+:host {
+  width: 100vw;
+  height: 100vh;
+}
+
+:host ::ng-deep{
+  .hover_underline:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,19 @@
+<section class="bread">
+    <div class="row">
+        <div class="col-md-6">
+            <ol class="breadcrumb p-0 pt-2 m-0 pb-2" style="background: none;">
+                <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs">
+                    <span [routerLink]="breadcrumb.url">
+                      {{ breadcrumb.label }}
+                    </span>
+                </li>
+            </ol>
+        </div>
+        <div class="col-md-6 text-right">
+            <div class="btn-group pt-1" role="group">
+                <button *ngFor="let item of buttons" type="{{item.type}}" class="{{item.class}} btn-xs p-1 pl-2 pr-2" [disabled]="item.disabled || false" (click)="action(item)" [hidden]="item.hidden || false"><i class="{{item.icon}}"></i> {{item.label}}</button>
+            </div>
+        </div>
+    </div>
+</section>
+

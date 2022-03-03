@@ -1,0 +1,92 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+
+<!-- Main content -->
+<section class="content">
+    <!-- Default box -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{(roledata.id==0)?'Create':'Edit'}} Role</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="">Name:</label>
+                                <input type="text" class="form-control" [(ngModel)]="roledata.name">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="active">
+                                    Active
+                                </label>
+                                <p-inputSwitch [(ngModel)]="roledata.active"></p-inputSwitch>
+                            </div>
+                        </div>
+                        <div class="col-md-2 pt-4" *ngIf="roledata.id==0">
+                            <div class="form-group">
+                                <button class="btn btn-warning" (click)="add()"><i class="fa fa-plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th style="width:80px;">Action</th>
+                            <th>Title</th>
+                            <th style="width:80px;">Active</th>  
+                        </tr>
+                        <tr *ngFor="let a of roleList">
+                            <td>
+                                <button class="btn btn-primary btn-sm mr-2" (click)="edit(a)"><i class="fa fa-edit"></i></button>
+                                <!-- <button class="btn btn-warning btn-sm" (click)="fillMenu(a)"><i class="fa fa-key"></i></button> -->
+                            </td>
+                            <td>{{a.name}}</td>
+                            <td>{{a.deleted_at==null?'Yes':'No'}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            </div>
+            <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{(roledata.name!='')?roledata.name+' - ':''}} Permissions</h5>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="selectdRole">
+                        <input type="checkbox" [(ngModel)]="checkallchk" (ngModelChange)="checkAll()">
+                        &nbsp;<span translate="">Select All</span>
+                        <div class="fixedheight">
+          
+                          <ul class="list-group">
+                            <li class="list-group-item p-0" *ngFor="let object of menues | groupBy:'parant'">
+                                <div class="col-md-12 p-0" style="background-color: #343a3f;color: #fff;">
+                                    <p class="pt-1 pb-2 pl-3" style="font-size:20px;"><input type="checkbox" [(ngModel)]='object.act' (ngModelChange)="selectMainMenu(object);">
+                                       {{object.key === 'undefined' ? '' : object.key }}</p>
+                                </div>
+                                <div class="col-md-12 pt-3" style="margin-top:-9px;padding-left:35px;" *ngFor="let item of object.value">
+                                  <label class="checkboxlabel text-info" style="min-width: 150px;">
+                                    <input type="checkbox" [(ngModel)]='item.act' (ngModelChange)="selectAll(item);"> {{item.menu}}</label>
+                                  <span class="badge badge-secondary ml-2 p-1" style="text-transform: capitalize;" *ngFor="let s of item.action">
+                                    <input type="checkbox" value="" [(ngModel)]="s.act" (click)="deselectMenu(item)"> {{s.val}}
+                                  </span>&nbsp;
+                                </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.card -->
+</section>
+<!-- /.content -->

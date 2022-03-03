@@ -1,0 +1,262 @@
+/* You can add global styles to this file, and also import other style files */
+// @import '~bootstrap/scss/bootstrap';
+
+@import url('https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.3.0/css/flag-icon.min.css');
+//@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,700;1,300;1,600;1,900');
+@import '~admin-lte/plugins/fontawesome-free/css/all.min.css';
+@import '~admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
+@import '~admin-lte/dist/css/adminlte.min.css';
+
+@import '~ngx-toastr/toastr';
+
+body {
+  //width: 100vw;
+  height: 100vh;
+  font-size: 0.8rem;
+  font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.user-menu > .nav-link {
+  cursor: pointer;
+}
+
+.user-menu > .nav-link:after {
+  content: none;
+}
+
+.user-menu > .dropdown-menu {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding: 0;
+  width: 280px;
+}
+
+.user-menu > .dropdown-menu,
+.user-menu > .dropdown-menu > .user-body {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.user-menu > .dropdown-menu > li.user-header {
+  height: 175px;
+  padding: 10px;
+  text-align: center;
+}
+
+.user-menu > .dropdown-menu > li.user-header > img {
+  z-index: 5;
+  height: 90px;
+  width: 90px;
+  border: 3px solid;
+  border-color: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-menu > .dropdown-menu > li.user-header > p {
+  z-index: 5;
+  font-size: 17px;
+  margin-top: 10px;
+}
+
+.user-menu > .dropdown-menu > li.user-header > p > small {
+  display: block;
+  font-size: 12px;
+}
+
+.user-menu > .dropdown-menu > .user-body {
+  border-bottom: 1px solid #495057;
+  border-top: 1px solid #dee2e6;
+  padding: 15px;
+}
+
+.user-menu > .dropdown-menu > .user-body::after {
+  display: block;
+  clear: both;
+  content: '';
+}
+
+.main-sidebar, .main-sidebar::before {
+  width: 200px;
+}
+
+body:not(.sidebar-mini-md) .content-wrapper, body:not(.sidebar-mini-md) .main-footer,
+body:not(.sidebar-mini-md) .main-header {
+  margin-left: 200px;
+}
+
+.sidebar-collapse .main-sidebar, .sidebar-collapse .main-sidebar::before {
+  margin-left: 0px;
+}
+
+body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-wrapper, body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-footer, body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .main-header {
+  margin-left: 200px;
+}
+
+.nav-sidebar > .nav-item, [class*=sidebar-dark-] .nav-sidebar > .nav-item.menu-open > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item:hover > .nav-link, [class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-link:focus {
+  width: 100%;
+}
+
+.nav-sidebar .nav-item > .nav-link {
+  width: 100%;
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active, .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .user-menu > .dropdown-menu > .user-body a {
+    background: #ffffff !important;
+    color: #495057 !important;
+  }
+}
+
+.user-menu > .dropdown-menu > .user-footer {
+  background-color: #f8f9fa;
+  padding: 10px;
+}
+
+.user-menu > .dropdown-menu > .user-footer::after {
+  display: block;
+  clear: both;
+  content: '';
+}
+
+.user-menu > .dropdown-menu > .user-footer .btn-default {
+  color: #6c757d;
+}
+
+@media (min-width: 576px) {
+  .user-menu > .dropdown-menu > .user-footer .btn-default:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.user-menu .user-image {
+  border-radius: 50%;
+  float: left;
+  height: 2.1rem;
+  margin-right: 10px;
+  margin-top: -2px;
+  width: 2.1rem;
+}
+
+@media (min-width: 576px) {
+  .user-menu .user-image {
+    float: none;
+    line-height: 10px;
+    margin-right: 0.4rem;
+    margin-top: -8px;
+  }
+}
+
+.user-menu .user-image {
+  height: 1.6rem;
+  width: 1.6rem;
+  margin-right: 0;
+  margin-left: -8px;
+}
+
+.p-datatable {
+  .p-datatable-thead{
+    > tr > th {
+      padding: 0.5rem 1rem !important;
+      font-size: 13px;
+    }
+  }
+  .p-datatable-tbody{
+    > tr > td {
+      //padding: 0rem 1rem !important;
+      padding: 8px 5px!important;
+    }
+  }
+  p-columnfilterformelement{
+    .p-inputtext{
+      padding: 0.2rem 0.3em !important;
+      font-size: 0.7rem !important;
+    }
+  }
+}
+
+// Custom
+
+.p-component {
+  font-size: 0.8rem !important;
+}
+
+.p-button.p-button-success.p-button-outlined,
+.p-buttonset.p-button-success > .p-button.p-button-outlined,
+.p-splitbutton.p-button-success > .p-button.p-button-outlined {
+  border: 0px !important;
+  background: unset !important;
+}
+
+.p-button.p-button-icon-only.p-button-rounded {
+  border-radius: 0 !important;
+}
+
+.p-button {
+  padding: 0.4rem 0.4rem !important;
+}
+
+.p-datatable {
+  border: 1px solid lightgray;
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 1em;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+.p-fluid .p-inputtext {
+  width: 100%;
+  height: 1.8rem;
+  font-size: 0.8rem !important;
+}
+
+html {
+  height: 101%;
+}
+
+.pi {
+  font-size: 0.8rem !important;
+}
+
+.layout-navbar-fixed .wrapper .content-wrapper {
+  margin-top: calc(2.2rem + 1px);
+}
+
+.main-header {
+  height: 40px;
+}
+.loading-overlay{
+  display:none;
+}
+.p-paginator .p-paginator-pages .p-paginator-page{
+  height:2rem;
+}
+.wrapper .content-wrapper {
+  min-height: calc(100vh - calc(3.5rem + 1px) - calc(1.5rem + 1px));
+}
+
+.fullwidth {
+  width:375px !important;
+  display: block !important;
+  position: relative;
+}

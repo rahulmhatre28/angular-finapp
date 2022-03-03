@@ -1,0 +1,137 @@
+<div class="card card-outline card-primary">
+  <div class="card-header text-center">
+    <a [routerLink]="['/']" class="h1"><b>Bingo</b>RAMA</a>
+  </div>
+  <div class="card-body">
+    <p class="login-box-msg">Register a new membership</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="!registerForm.invalid && registerUser()">
+      <div class="input-group mb-3">
+        <input
+          formControlName="first_name"
+          type="text"
+          class="form-control"
+          placeholder="First Name"
+        />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <span class="fas fa-user-circle"></span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="f.first_name.touched && f.first_name.invalid">
+          <small *ngIf="f.first_name.errors?.required" class="p-error">First Name is required.</small>
+        </div>
+      </div>
+      <div class="input-group mb-3">
+        <input
+          formControlName="last_name"
+          type="text"
+          class="form-control"
+          placeholder="Last Name"
+        />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <span class="fas fa-user-circle"></span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="f.last_name.touched && f.last_name.invalid">
+          <small *ngIf="f.last_name.errors?.required" class="p-error">Last Name is required.</small>
+        </div>
+      </div>
+      <div class="input-group mb-3">
+        <input
+          formControlName="phone"
+          type="text"
+          class="form-control"
+          placeholder="Phone"
+        />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <span class="fas fa-phone"></span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="f.phone.touched && f.phone.invalid">
+          <small *ngIf="f.phone.errors?.required" class="p-error">Phone is required.</small>
+        </div>
+      </div>
+      <div class="input-group mb-3">
+        <input
+          formControlName="email"
+          type="email"
+          class="form-control"
+          placeholder="Email"
+        />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <span class="fas fa-envelope"></span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="f.email.touched && f.email.invalid">
+          <small *ngIf="f.email.errors?.required" class="p-error">Email is required.</small>
+        </div>
+      </div>
+      <div class="input-group mb-3">
+        <input
+          formControlName="password"
+          type="password"
+          class="form-control"
+          placeholder="Password"
+        />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <span class="fas fa-lock"></span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="f.password.touched && f.password.invalid">
+          <small *ngIf="f.password.errors?.required" class="p-error">Password is required.</small>
+        </div>
+      </div>
+      <div class="input-group mb-3">
+        <input
+          formControlName="retypePassword"
+          type="password"
+          class="form-control"
+          placeholder="Retype password"
+        />
+        <div class="input-group-append">
+          <div class="input-group-text">
+            <span class="fas fa-lock"></span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="f.retypePassword.touched && f.retypePassword.invalid">
+          <small *ngIf="f.retypePassword.errors?.required" class="p-error">Password is required.</small>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-7">
+          <div class="icheck-primary">
+            <input
+              type="checkbox"
+              id="agreeTerms"
+              name="terms"
+              value="agree"
+            />
+            <label for="agreeTerms">
+              I agree to the <a href="#">terms</a>
+            </label>
+          </div>
+        </div>
+        <!-- /.col -->
+        <div class="col-5">
+          <app-button
+            [type]="'submit'"
+            [block]="true"
+            [loading]="isAuthLoading"
+          >
+            Register
+          </app-button>
+        </div>
+        <!-- /.col -->
+      </div>
+    </form>
+
+    <a [routerLink]="['/login']" class="text-center hover_underline">
+      I already have a membership</a
+    >
+  </div>
+</div>

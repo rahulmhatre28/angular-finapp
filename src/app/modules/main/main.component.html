@@ -1,0 +1,15 @@
+<app-header (toggleMenuSidebar)="toggleMenuSidebar()"></app-header>
+
+<app-menu-sidebar
+    class="main-sidebar sidebar-dark-primary elevation-4"
+></app-menu-sidebar>
+
+<div class="content-wrapper">
+    <router-outlet></router-outlet>
+</div>
+<div class="loading-overlay {{globalService.is_loading ? 'is-active' : ''}}">
+  <span class="fas fa-spinner fa-3x fa-spin"></span>
+</div>
+<app-footer class="main-footer"></app-footer>
+<aside class="control-sidebar control-sidebar-dark"></aside>
+<div id="sidebar-overlay" (click)="toggleMenuSidebar()"></div>

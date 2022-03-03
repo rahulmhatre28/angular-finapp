@@ -1,0 +1,829 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+<div class="card">
+    <div class="card-body">
+        <form [formGroup]="loanForm" (ngSubmit)="!loanForm.invalid">
+            <p-tabView>
+                <p-tabPanel header="Loan Details" >
+                    <div class="row" *ngIf="!through_channel">
+                        <div class="col-md-4" *ngIf="roleid<=1">
+                            <div class="form-group">
+                                <label for="">Select Branch Head</label>
+                                <select formControlName="b_head" class="form-control" (change)="loadUser(2,f.b_head.value)">
+                                    <option value="">-- Select --</option>
+                                    <option value="{{user.id}}" *ngFor="let user of branchHeadList">{{user.first_name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" *ngIf="roleid<=2">
+                            <div class="form-group">
+                                <label for="">Select Branch Sales Manager</label>
+                                <select formControlName="b_sales_manager" class="form-control" (change)="loadUser(3,f.b_sales_manager.value)">
+                                    <option value="">-- Select --</option>
+                                    <option value="{{user.id}}" *ngFor="let user of salesManagerList">{{user.first_name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" *ngIf="roleid<=3">
+                            <div class="form-group">
+                                <label for="">Select Sales Executive</label>
+                                <select formControlName="sales_executive" class="form-control" (change)="loadUser(4,f.sales_executive.value)">
+                                    <option value="">-- Select --</option>
+                                    <option value="{{user.id}}" *ngFor="let user of salesExecutiveList">{{user.full_name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" *ngIf="roleid<=4">
+                            <div class="form-group">
+                                <label for="">Select Executive</label>
+                                <select formControlName="executive" class="form-control" (change)="loadChannel()">
+                                    <option value="">-- Select --</option>
+                                    <option value="{{user.id}}" *ngFor="let user of executiveList">{{user.full_name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div *ngIf="roleid==5">
+                            <input type="hidden" formControlName="executive">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Select Channel</label>
+                                <select formControlName="channel_id" class="form-control">
+                                     <option value="null">-- Select --</option>
+                                     <option value="{{a.id}}" *ngFor="let a of channelList">{{a.name}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.channel_id.touched && f.channel_id.invalid">
+                                    <small *ngIf="f.channel_id.errors?.required" class="p-error">Channel is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="through_channel">
+                        <input type="hidden" formControlName="channel_id">
+                    </div>
+                   <div class="row">
+                       <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">What kind of loan you are looking for?</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_option_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_option_type.touched && f.loan_option_type.invalid">
+                                    <small *ngIf="f.loan_option_type.errors?.required" class="p-error">What kind of loan you are looking for is required.</small>
+                                </div>
+                            </div>
+                       </div>
+                       <div class="col-md-4">
+                            <div class="form-group" *ngIf="f.loan_option_type.value==1">
+                                <label for="">Loan Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of business_loan_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_type.touched && f.loan_type.invalid">
+                                    <small *ngIf="f.loan_type.errors?.required" class="p-error">Loan type is required.</small>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="f.loan_option_type.value==2">
+                                <label for="">Loan Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of salaried_loan_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_type.touched && f.loan_type.invalid">
+                                    <small *ngIf="f.loan_type.errors?.required" class="p-error">Loan type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" *ngIf="f.loan_type.value==13">
+                                <label for="">Loan Other Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_other_type"
+                                  class="form-control"
+                                >
+                                <option value="0">--Select--</option>
+                                <option value="{{a.key}}" *ngFor="let a of other_loans_list">{{a.value}}</option>
+                                </select>  
+                            </div>
+                        </div>
+                   </div>
+                   <div class="row" *ngIf="f.loan_option_type.value==1">
+                       <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Annual PAT (Profit After Tax)</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="annual_pat" inputStyleClass="fullwidth"
+                                ></p-inputNumber>
+                                <div class="col-12" *ngIf="f.annual_pat.touched && f.annual_pat.invalid">
+                                    <small *ngIf="f.annual_pat.errors?.required" class="p-error">Annual PAT is required.</small>
+                                </div>
+                            </div>
+                       </div>
+                       <!-- <div class="col-md-2">
+                            <label for="" class="d-block">In Cr.</label>
+                            <p-inputSwitch></p-inputSwitch>
+                       </div> -->
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==1">
+                       <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Amount</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="loan_amount" inputStyleClass="fullwidth"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="loan_amount"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.loan_amount.touched && f.loan_amount.invalid">
+                                    <small *ngIf="f.loan_amount.errors?.required" class="p-error">Loan Amount is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-2">
+                            <label for="" class="d-block">In Cr.</label>
+                            <p-inputSwitch></p-inputSwitch>
+                       </div> -->
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Product Group</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_product_group"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_product_group_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_product_group.touched && f.loan_product_group.invalid">
+                                    <small *ngIf="f.loan_product_group.errors?.required" class="p-error">Loan Product Group is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Property Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="property_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of property_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.property_type.touched && f.property_type.invalid">
+                                    <small *ngIf="f.property_type.errors?.required" class="p-error">Property Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Annual Turnover</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="annual_turnover" inputStyleClass="fullwidth"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="annual_turnover"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.annual_turnover.touched && f.annual_turnover.invalid">
+                                    <small *ngIf="f.annual_turnover.errors?.required" class="p-error">Annual Turnover is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-2">
+                            <label for="" class="d-block">In Cr.</label>
+                            <p-inputSwitch></p-inputSwitch>
+                       </div> -->
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==1">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Usage Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_usage_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_usage_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_usage_type.touched && f.loan_usage_type.invalid">
+                                    <small *ngIf="f.loan_usage_type.errors?.required" class="p-error">Loan Usage Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_sub_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_sub_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_sub_type.touched && f.loan_sub_type.invalid">
+                                    <small *ngIf="f.loan_sub_type.errors?.required" class="p-error">Loan Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                   <div class="row" *ngIf="f.loan_option_type.value==2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Net Income</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="net_income" inputStyleClass="fullwidth"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="net_income"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.net_income.touched && f.net_income.invalid">
+                                    <small *ngIf="f.net_income.errors?.required" class="p-error">Net Income is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-2">
+                            <label for="" class="d-block">In Cr.</label>
+                            <p-inputSwitch></p-inputSwitch>
+                       </div> -->
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Amount</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="loan_amount" inputStyleClass="fullwidth"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="loan_amount"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.loan_amount.touched && f.loan_amount.invalid">
+                                    <small *ngIf="f.loan_amount.errors?.required" class="p-error">Loan Amount is required.</small>
+                                </div>
+                            </div>
+                        </div> 
+                        <!-- <div class="col-md-2">
+                            <label for="" class="d-block">In Cr.</label>
+                            <p-inputSwitch></p-inputSwitch>
+                       </div> -->
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Gross Income</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="gross_income" inputStyleClass="fullwidth"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="gross_income"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.gross_income.touched && f.gross_income.invalid">
+                                    <small *ngIf="f.gross_income.errors?.required" class="p-error">Gross Income is required.</small>
+                                </div>
+                            </div>
+                        </div>  
+                        <!-- <div class="col-md-2">
+                            <label for="" class="d-block">In Cr.</label>
+                            <p-inputSwitch></p-inputSwitch>
+                       </div> -->
+                    </div>
+                    <div class="row" *ngIf="f.loan_option_type.value==2">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Product Group</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_product_group"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_product_group_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_product_group.touched && f.loan_product_group.invalid">
+                                    <small *ngIf="f.loan_product_group.errors?.required" class="p-error">Loan Product Group is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Property Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="property_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of property_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.property_type.touched && f.property_type.invalid">
+                                    <small *ngIf="f.property_type.errors?.required" class="p-error">Property Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Usage Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_usage_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_usage_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_usage_type.touched && f.loan_usage_type.invalid">
+                                    <small *ngIf="f.loan_usage_type.errors?.required" class="p-error">Loan Usage Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Loan Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="loan_sub_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of loan_sub_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_sub_type.touched && f.loan_sub_type.invalid">
+                                    <small *ngIf="f.loan_sub_type.errors?.required" class="p-error">Loan Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                </p-tabPanel>
+                <p-tabPanel header="Business Profile" *ngIf="f.loan_option_type.value==1">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="business_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of business_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.business_type.touched && f.business_type.invalid">
+                                    <small *ngIf="f.business_type.errors?.required" class="p-error">Business Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business Name</label>
+                                <span class="text-danger d-none">*</span>
+                                <input
+                                  formControlName="business_name"
+                                  class="form-control"
+                                  type = "text"
+                                >
+                                <div class="col-12" *ngIf="f.business_name.touched && f.business_name.invalid">
+                                    <small *ngIf="f.business_name.errors?.required" class="p-error">Business Name is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Number of years since Business Started</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber 
+                                  formControlName="business_years" inputStyleClass="fullwidth" [useGrouping]="false"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="business_years"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.business_years.touched && f.business_years.invalid">
+                                    <small *ngIf="f.business_years.errors?.required" class="p-error">Number of years since Business Started is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business GST Number</label>
+                                <span class="text-danger d-none">*</span>
+                                <input
+                                  formControlName="business_gst"
+                                  class="form-control"
+                                  type = "text"
+                                >
+                                <div class="col-12" *ngIf="f.business_gst.touched && f.business_gst.invalid">
+                                    <small *ngIf="f.business_gst.errors?.required" class="p-error">Business GST Number is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="Salaried Profile" *ngIf="f.loan_option_type.value==2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Existing Profile</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="existing_profile"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="1">Laxman</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.existing_profile.touched && f.existing_profile.invalid">
+                                    <small *ngIf="f.existing_profile.errors?.required" class="p-error">Existing Profile is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Borrower Type</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="borrower_type"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{a.key}}" *ngFor="let a of borrower_type_list">{{a.value}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.borrower_type.touched && f.borrower_type.invalid">
+                                    <small *ngIf="f.borrower_type.errors?.required" class="p-error">Borrower Type is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="Contact & Location" *ngIf="f.loan_option_type.value==1">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business State</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="business_state"
+                                  class="form-control"
+                                  (change) = "loadLocation('business_city',f.business_state.value)"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{city.id}}" *ngFor="let city of businessStateList">{{city.name}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.business_state.touched && f.business_state.invalid">
+                                    <small *ngIf="f.business_state.errors?.required" class="p-error">Business State is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business City</label>
+                                <span class="text-danger d-none">*</span>
+                                <select
+                                  formControlName="business_city"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="{{city.id}}" *ngFor="let city of businessCityList">{{city.name}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.business_city.touched && f.business_city.invalid">
+                                    <small *ngIf="f.business_city.errors?.required" class="p-error">Business City is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business Location</label>
+                                <span class="text-danger d-none">*</span>
+                                <input
+                                      formControlName="business_location"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                />
+                                <!-- <select
+                                  formControlName="business_location"
+                                  class="form-control"
+                                >
+                                    <option value="0">--Select--</option>
+                                    <option value="1">Andheri</option>
+                                </select> -->
+                                <div class="col-12" *ngIf="f.business_location.touched && f.business_location.invalid">
+                                    <small *ngIf="f.business_location.errors?.required" class="p-error">Business Location is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business Pincode</label>
+                                <span class="text-danger d-none">*</span>
+                                <p-inputNumber 
+                                  formControlName="business_pincode" inputStyleClass="fullwidth" [useGrouping]="false"
+                                ></p-inputNumber>
+                                <!-- <input
+                                  formControlName="business_pincode"
+                                  class="form-control"
+                                  type = "text"
+                                > -->
+                                <div class="col-12" *ngIf="f.business_pincode.touched && f.business_pincode.invalid">
+                                    <small *ngIf="f.business_pincode.errors?.required" class="p-error">Business Pincode is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business Address Line 1</label>
+                                <span class="text-danger d-none">*</span>
+                                <input
+                                  formControlName="business_address_line_1"
+                                  class="form-control"
+                                  type = "text"
+                                >
+                                <div class="col-12" *ngIf="f.business_address_line_1.touched && f.business_address_line_1.invalid">
+                                    <small *ngIf="f.business_address_line_1.errors?.required" class="p-error">Business Address Line 1 is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Business Address Line 2</label>
+                                <span class="text-danger d-none">*</span>
+                                <input
+                                  formControlName="business_address_line_2"
+                                  class="form-control"
+                                  type = "text"
+                                >
+                                <div class="col-12" *ngIf="f.business_address_line_2.touched && f.business_address_line_2.invalid">
+                                    <small *ngIf="f.business_address_line_2.errors?.required" class="p-error">Business Address Line 2 is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="Applicant Details">
+                    <div class="row" *ngIf="f.loan_option_type.value==1">
+                        <div class="col-md-12 text-right">
+                            <button type="button" class="btn btn-info btn-xs" (click)="addApplicant()"><i class="fa fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div *ngFor="let applicant of applicantFormGroups; let i = index">
+                        <div class="row" style="border-top:1px solid grey" *ngIf="i>0">
+                            <div class="col-md-12 text-right pt-1">
+                                <button type="button" class="btn btn-danger btn-xs" (click)="removeApplicant(i)"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="row" [formGroup]="applicant">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">First Name</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <input
+                                      formControlName="fname"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                    />
+                                    <div class="col-12" *ngIf="applicant.controls.fname.touched && applicant.controls.fname.invalid">
+                                        <small *ngIf="applicant.controls.fname.errors?.required" class="p-error">First Name is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">Last Name</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <input
+                                      formControlName="lname"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                    />
+                                    <div class="col-12" *ngIf="applicant.controls.lname.touched && applicant.controls.lname.invalid">
+                                        <small *ngIf="applicant.controls.lname.errors?.required" class="p-error">Last Name is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">Email</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <input
+                                      formControlName="email"
+                                      type="email"
+                                      class="form-control"
+                                      
+                                    />
+                                    <div class="col-12" *ngIf="applicant.controls.email.touched && applicant.controls.email.invalid">
+                                        <small *ngIf="applicant.controls.email.errors?.required" class="p-error">Email is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">Phone Number</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <p-inputMask mask="(999) 999-9999" formControlName="phone_1" styleClass="fullwidth"></p-inputMask>
+                                    <!-- <input
+                                      formControlName="phone_1"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                    /> -->
+                                    <div class="col-12" *ngIf="applicant.controls.phone_1.touched && applicant.controls.phone_1.invalid">
+                                        <small *ngIf="applicant.controls.phone_1.errors?.required" class="p-error">Phone Number 1 is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">Phone Number 2</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <p-inputMask mask="(999) 999-9999" formControlName="phone_2" styleClass="fullwidth"></p-inputMask>
+                                    <!-- <input
+                                      formControlName="phone_2"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                    /> -->
+                                    <div class="col-12" *ngIf="applicant.controls.phone_2.touched && applicant.controls.phone_2.invalid">
+                                        <small *ngIf="applicant.controls.phone_2.errors?.required" class="p-error">Phone Number 2 is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">Pincode</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <p-inputNumber 
+                                        formControlName="pincode" inputStyleClass="fullwidth" [useGrouping]="false"
+                                    ></p-inputNumber>
+                                    <!-- <input
+                                      formControlName="pincode"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                    /> -->
+                                    <div class="col-12" *ngIf="applicant.controls.pincode.touched && applicant.controls.pincode.invalid">
+                                        <small *ngIf="applicant.controls.pincode.errors?.required" class="p-error">Pincode is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">State</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <select
+                                      formControlName="state"
+                                      class="form-control"
+                                      (change) = "loadLocation('city',applicant.controls.state.value)"
+                                    >
+                                        <option value="0">--Select--</option>
+                                        <option value="{{state.id}}" *ngFor="let state of stateList">{{state.name}}</option>
+                                    </select>
+                                    <div class="col-12" *ngIf="applicant.controls.state.touched && applicant.controls.state.invalid">
+                                        <small *ngIf="applicant.controls.state.errors?.required" class="p-error">State is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">City</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <select
+                                      formControlName="city"
+                                      class="form-control"
+                                    >
+                                        <option value="0">--Select--</option>
+                                        <option value="{{city.id}}" *ngFor="let city of cityList">{{city.name}}</option>
+                                    </select>
+                                    <div class="col-12" *ngIf="applicant.controls.city.touched && applicant.controls.city.invalid">
+                                        <small *ngIf="applicant.controls.city.errors?.required" class="p-error">City is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="">Locality</label>
+                                    <span class="text-danger d-none">*</span>
+                                    <input
+                                      formControlName="locality"
+                                      type="text"
+                                      class="form-control"
+                                      
+                                    />
+                                    <!-- <select
+                                      formControlName="locality"
+                                      class="form-control"
+                                    >
+                                        <option value="0">--Select--</option>
+                                        <option value="1">Andheri</option>
+                                    </select> -->
+                                    <div class="col-12" *ngIf="applicant.controls.locality.touched && applicant.controls.locality.invalid">
+                                        <small *ngIf="applicant.controls.locality.errors?.required" class="p-error">Locality is required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </p-tabPanel>
+                <p-tabPanel header="KYC Documents">
+                    <p-fileUpload multiple="multiple" [showUploadButton]="false" (onSelect)="onSelectFile($event)"  #KYCDocs>
+                        <ng-template pTemplate="file"></ng-template>
+                        <ng-template pTemplate="content">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>File Name</th>
+                                    <th style="width:120px">Size</th>
+                                    <th style="width:80px">View</th>
+                                    <th style="width:80px">Remove</th>
+                                </tr>
+                                <tr *ngFor="let file of KYCDocs._files;let i=index">
+                                    <td>{{file.name}}</td>
+                                    <td>{{globalService.humanFileSize(file.size)}}</td>
+                                    <td class="text-center"><a type="button" class="btn btn-info btn-xs" href="{{file.objectURL==undefined ? '':file.objectURL.changingThisBreaksApplicationSecurity}}" target="_BLANK"><i class="fa fa-eye"></i></a></td>
+                                    <td class="text-center"><button type="button" class="btn btn-danger btn-xs" (click)="removeDocument(KYCDocs,i)"><i class="pi pi-times"></i></button></td>
+                                </tr>
+                            </table>
+                        </ng-template>
+                    </p-fileUpload>
+                </p-tabPanel>
+                <p-tabPanel header="Financial Documents">
+                    <p-fileUpload multiple="multiple" [showUploadButton]="false" (onSelect)="onSelectFile($event)"  #FinanceDocs>
+                        <ng-template pTemplate="file"></ng-template>
+                        <ng-template pTemplate="content">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>File Name</th>
+                                    <th style="width:120px">Size</th>
+                                    <th style="width:80px">View</th>
+                                    <th style="width:80px">Remove</th>
+                                </tr>
+                                <tr *ngFor="let file of FinanceDocs._files;let i=index">
+                                    <td>{{file.name}}</td>
+                                    <td>{{globalService.humanFileSize(file.size)}}</td>
+                                    <td class="text-center"><a type="button" class="btn btn-info btn-xs" href="{{file.objectURL==undefined ? '':file.objectURL.changingThisBreaksApplicationSecurity}}" target="_BLANK"><i class="fa fa-eye"></i></a></td>
+                                    <td class="text-center"><button type="button" class="btn btn-danger btn-xs" (click)="removeDocument(FinanceDocs,i)"><i class="pi pi-times"></i></button></td>
+                                </tr>
+                            </table>
+                        </ng-template>
+                    </p-fileUpload>
+                </p-tabPanel>
+                <p-tabPanel header="Other Documents">
+                    <p-fileUpload multiple="multiple" [showUploadButton]="false" (onSelect)="onSelectFile($event)"  #OtherDocs>
+                        <ng-template pTemplate="file"></ng-template>
+                        <ng-template pTemplate="content">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>File Name</th>
+                                    <th style="width:120px">Size</th>
+                                    <th style="width:80px">View</th>
+                                    <th style="width:80px">Remove</th>
+                                </tr>
+                                <tr *ngFor="let file of OtherDocs._files;let i=index">
+                                    <td>{{file.name}}</td>
+                                    <td>{{globalService.humanFileSize(file.size)}}</td>
+                                    <td class="text-center"><a type="button" class="btn btn-info btn-xs" href="{{file.objectURL==undefined ? '':file.objectURL.changingThisBreaksApplicationSecurity}}" target="_BLANK"><i class="fa fa-eye"></i></a></td>
+                                    <td class="text-center"><button type="button" class="btn btn-danger btn-xs" (click)="removeDocument(OtherDocs,i)"><i class="pi pi-times"></i></button></td>
+                                </tr>
+                            </table>
+                        </ng-template>
+                    </p-fileUpload>
+                </p-tabPanel>
+            </p-tabView>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,115 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+<p-table [value]="loanList" [lazy]="true" (onLazyLoad)="loadLoan($event)" responsiveLayout="scroll" dataKey="id"
+    [selection]="selectedCustomers" [selectAll]="selectAll"
+    [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading" [globalFilterFields]="['ref_no','applicant_name','sales_person_lbl', 'created_at']" styleClass="p-datatable-gridlines" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 130px;">Action</th>
+            <th pSortableColumn="ref_no">#REF No. <p-sortIcon field="ref_no"></p-sortIcon></th>
+            <th pSortableColumn="applicant_name">Business Name <p-sortIcon field="applicant_name"></p-sortIcon></th>
+            <th pSortableColumn="sales_person_lbl">Sales Person <p-sortIcon field="sales_person_lbl"></p-sortIcon></th>
+            <th *ngIf="pagetype!='application'">Lenders</th>
+            <th pSortableColumn="created_at">Applied Date <p-sortIcon field="created_at"></p-sortIcon></th>
+        </tr>
+        <tr>
+            <th style="width: 130px;">
+            </th>
+            <th><p-columnFilter type="text" field="ref_no"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="applicant_name"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="sales_person_lbl"></p-columnFilter></th>
+            <th *ngIf="pagetype!='application'"></th>
+            <th><p-columnFilter type="text" field="created_at"></p-columnFilter></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-loan>
+        <tr>
+            <td style="width: 130px;">
+                <button class="btn btn-primary btn-xs mr-1" (click)="edit(loan)" title="Edit Loan"><i class="fa fa-edit"></i></button>
+                <button class="btn btn-info btn-xs mr-1" title="View Loan"><i class="fa fa-eye"></i></button>
+                <button class="btn btn-success btn-xs mr-1" title="Change Sales Person"><i class="fa fa-user"></i></button>
+                <button class="btn btn-warning btn-xs text-white" title="Assign Lender" (click)="assignLoan(loan)"><strong>L</strong></button>
+            </td>
+            <td>{{loan.ref_no}}</td>
+            <td>{{loan.applicant_name}}</td>
+            <td>{{loan.sales_person_lbl}}</td>
+            <td *ngIf="pagetype!='application'">
+                <ul *ngIf="loan.lenders.length>0">
+                   <li *ngFor="let a of loan.lenders">
+                       {{a.bank_name}} - {{a.username}}
+                   </li> 
+                </ul>
+            </td>
+            <td>{{loan.created_at | date : 'd-M-y h:mm:ss a'}}</td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog header="Loan Assignment" [(visible)]="displayLoanAssignDialog">
+    <form [formGroup]="assignForm" (ngSubmit)="!assignForm.invalid && saveAssign()">
+    <div class="row" style="max-height:80vh">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="">Select Loan Status</label>
+                <select formControlName="loan_status" class="form-control" required>
+                    <option value="null">-- Select --</option>
+                    <option value="approve">Approve</option>
+                    <option value="onhold">On Hold</option>
+                    <option value="reject">Reject</option>
+                </select>
+                <div class="col-12" *ngIf="f.loan_status.touched && f.loan_status.invalid">
+                    <small *ngIf="f.loan_status.errors?.required" class="p-error">Loan status is required.</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="">Select Lenders</label>
+                <select formControlName="bank" class="form-control" (change)="addLender()">
+                    <option value="">-- Select --</option>
+                    <option value="{{a | json}}" *ngFor="let a of bankList">{{a.name}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Bank Name</th>
+                    <th>Lenders</th>
+                    <th style="width:80px;">Remove</th>
+                </tr>
+                <tr *ngFor="let lender of lenderFormGroups; let i = index" [formGroup]="lender">
+                    <td>
+                        {{lender.controls.bankname.value}}
+                    </td>
+                    <td>
+                        <select formControlName="bank_user_id" class="form-control" required>
+                            <option value="">-- Select --</option>
+                            <option value="{{user.id}}" *ngFor="let user of lender.controls.lenderList.value">{{user.name}}</option>
+                        </select>
+                        <div class="col-12" *ngIf="lender.controls.bank_user_id.touched && lender.controls.bank_user_id.invalid">
+                            <small *ngIf="lender.controls.bank_user_id.errors?.required" class="p-error">Lender is required.</small>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-xs" (click)="removeLender(i)"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr *ngIf="lenderFormGroups.length==0">
+                    <td colspan="3" class="text-center">No lender assigned</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <!-- <div class="col-md-6">
+            <div class="field-checkbox">
+                <p-checkbox formControlName="is_email_to_be_send" binary="true" ngDefaultControl></p-checkbox>
+                <label for="binary">Send Email</label>
+            </div>
+        </div> -->
+        <div class="col-md-6 text-right">
+            <button class="btn btn-primary">Assign & Update</button>
+        </div>
+    </div>
+    </form>
+</p-dialog>

@@ -1,0 +1,124 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success p-mr-2 ms-2" (click)="Addnew()"></button><span class="h1 m-3">Moms</span>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">Masters</li>
+                    <li class="breadcrumb-item active">General</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+ <!-- /.container-fluid -->
+</section>
+<section class="mom-section content ">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="row p-2">
+                <div class="col-3">
+                    <div class="form-group">
+                        <div class="p-field">
+                            <label for="masters" class="h5">Masters</label>
+                            <p-listbox [options]="groups" [(ngModel)]="selectedGroup" [filter]="true" (onChange) = "onRowClick($event.value)" optionLabel="name" filterPlaceHolder="Search" emptyFilterMessage="No results found" [listStyle]="{'max-height':'440px'}"></p-listbox>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <p-table [value]="momList" [lazy]="true" (onLazyLoad)="loadMomList($event)" responsiveLayout="scroll" dataKey="id" (selectionChange)="onSelectionChange($event)" [selectAll]="selectAll"
+                        [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading" [globalFilterFields]="['name','country.name', 'company', 'representative.name']">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="code">Code <p-sortIcon field="code"></p-sortIcon></th>
+                                <th pSortableColumn="country.name">Name <p-sortIcon field="country.name"></p-sortIcon></th>
+                                <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                                <th pSortableColumn="status.active">Active <p-sortIcon field="status.active"></p-sortIcon></th>
+                                <th pSortableColumn="name">Action</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <p-columnFilter type="text" field="name"></p-columnFilter>
+                                </th>
+                                <th>
+                                    <p-columnFilter type="text" field="country.name"></p-columnFilter>
+                                </th>
+                                <th>
+                                    <p-columnFilter type="text" field="company"></p-columnFilter>
+                                </th>
+                                <th>
+                                    <p-columnFilter field="representative" matchMode="in" [showMenu]="false">
+                                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                            <p-dropdown [ngModel]="value" [options]="status" placeholder="Any" (onChange)="filter($event.value)" optionLabel="active" baseZIndex="99999"></p-dropdown>
+                                        </ng-template>
+                                    </p-columnFilter>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-mom>
+                            <tr>
+                                <td>{{mom.name}}</td>
+                                <td>{{mom.name}}</td>
+                                <td>{{mom.name}}</td>
+                                <td>{{mom.name}}</td>
+                                <td>
+                                    <button pButton pRipple icon="pi pi-pencil" class="p-button-outlined p-button-rounded p-button-success p-mr-2" tooltipPosition="top" pTooltip="Edit"  (click)="edit()"></button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage" let-cols>
+                            <tr>
+                              <td colspan="6">
+                                <div class="text-center"> {{momList.length ? 'Please wait...' : 'No records found.'}}</div>
+                              </td>
+                            </tr>
+                          </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p-toast></p-toast>
+</section>
+<section class="crt-mom-section">
+    <p-dialog [(visible)]="momDialog" [style]="{width: '450px'}" header="{{selectedMaster.name}}" [modal]="true" styleClass="p-fluid">
+        <ng-template pTemplate="content">
+            <div class="for-group mb-2">
+                <div class="p-field">
+                    <label for="name">Code</label>
+                    <input class="form-control" pInputText [(ngModel)]="mom.code" size="16" id="code" name="code" tabindex="1"
+                    type="text" (blur)="checkAvailability()" placeholder="Code" required autofocus [disabled]="mom.id>0" />
+                    <small class="p-error" *ngIf="submitted && !mom.code">Code is required.</small>
+                </div>
+            </div>
+            <div class="for-group mb-2">
+                <div class="p-field">
+                    <label for="description">Name</label>
+                    <input class="form-control" pInputText [(ngModel)]="mom.name" size="16" id="name" required type="text" tabindex="2"
+                    placeholder="Name" />
+                </div>
+            </div>
+            <div class="for-group mb-2">
+                <div class="p-field">
+                    <label for="description">Description</label>
+                    <input class="form-control" pInputText [(ngModel)]="mom.description" size="16" type="text" required tabindex="3"
+                    placeholder="Description" />
+                </div>
+            </div>
+            <div class="for-group">
+                <div class="p-field">
+                    <label for="active" class="mb-1" required>Active</label><br>
+                    <p-inputSwitch [(ngModel)]="mom.active" ariaLabelledBy="" tabindex="4"></p-inputSwitch>
+                </div>
+            </div>
+        </ng-template>
+    
+        <ng-template pTemplate="footer">
+            <button pButton pRipple type="button" label="Cancel" class="p-button-raised p-button-help p-button-text" (click)="hideDialog()"></button>
+            <button pButton pRipple type="button" label="Save" class="p-button-raised p-button-success p-button-text" (click)="saveMom()"></button>
+        </ng-template>
+    </p-dialog>
+</section>

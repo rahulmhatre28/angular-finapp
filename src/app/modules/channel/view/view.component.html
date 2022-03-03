@@ -1,0 +1,43 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+<p-table [value]="userList" [lazy]="true" (onLazyLoad)="loadUser($event)" responsiveLayout="scroll" dataKey="id"
+    [selection]="selectedCustomers" [selectAll]="selectAll"
+    [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading" [globalFilterFields]="['name','country.name', 'company', 'representative.name']">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 100px;">Action</th>
+            <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+            <th pSortableColumn="phone">Phone <p-sortIcon field="phone"></p-sortIcon></th>
+            <th pSortableColumn="pan">PAN <p-sortIcon field="pan"></p-sortIcon></th>
+            <th pSortableColumn="gst">GST <p-sortIcon field="gst"></p-sortIcon></th>
+            <th pSortableColumn="pincode">PIN Code <p-sortIcon field="pincode"></p-sortIcon></th>
+            <th pSortableColumn="created_at">Created On <p-sortIcon field="created_at"></p-sortIcon></th>
+        </tr>
+        <tr>
+            <th style="width: 100px;">
+            </th>
+            <th><p-columnFilter type="text" field="name"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="email"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="phone"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="pan"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="gst"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="pincode"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="created_at"></p-columnFilter></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-customer>
+        <tr>
+            <td style="width: 100px;">
+                <button class="btn btn-danger btn-xs mr-2" (click)="delete(customer)"><i class="fa fa-trash"></i></button>
+                <button class="btn btn-primary btn-xs" (click)="edit(customer)"><i class="fa fa-edit"></i></button>
+            </td>
+            <td>{{customer.name}}</td>
+            <td>{{customer.email}}</td>
+            <td>{{customer.phone}}</td>
+            <td>{{customer.pan}}</td>
+            <td>{{customer.gst}}</td>
+            <td>{{customer.pincode}}</td>
+            <td>{{customer.created_at | date : 'd-M-y h:mm:ss a'}}</td>
+        </tr>
+    </ng-template>
+</p-table>

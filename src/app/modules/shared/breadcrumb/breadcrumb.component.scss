@@ -1,0 +1,17 @@
+.bread{
+    background: #fff;
+    background: -webkit-gradient(left top,left bottom,color-stop(0,#fff),color-stop(47%,#f6f6f6),color-stop(100%,#ededed));
+    background: linear-gradient(to bottom,#fff 0,#f6f6f6 47%,#ededed 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ededed', GradientType=0);
+    margin-bottom: 10px;
+    border-radius: 0;
+    border-bottom: 1px solid #898b8d;
+    padding:0 10px;
+}
+.activelable{
+    color: #0dcaf0;
+}
+
+.breadcrumb li:last-child{
+    color: #0dcaf0;
+}

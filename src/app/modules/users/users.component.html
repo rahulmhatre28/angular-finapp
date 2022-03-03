@@ -1,0 +1,212 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+<p-table [value]="userList" [lazy]="true" (onLazyLoad)="loadUser($event)" responsiveLayout="scroll" dataKey="id"
+    [selection]="selectedCustomers" [selectAll]="selectAll"
+    [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading" [globalFilterFields]="['name','country.name', 'company', 'representative.name']">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 100px;">Action</th>
+            <th pSortableColumn="name">Name <p-sortIcon field="full_name"></p-sortIcon></th>
+            <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+            <th pSortableColumn="phone">Phone <p-sortIcon field="phone"></p-sortIcon></th>
+            <th pSortableColumn="role">Role <p-sortIcon field="role"></p-sortIcon></th>
+            <th pSortableColumn="parent_user">Reporting Person <p-sortIcon field="role"></p-sortIcon></th>
+            <th pSortableColumn="created_at">Created On <p-sortIcon field="created_at"></p-sortIcon></th>
+        </tr>
+        <tr>
+            <th style="width: 100px;">
+            </th>
+            <th><p-columnFilter type="text" field="full_name"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="email"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="phone"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="role"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="parent_user"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="created_at"></p-columnFilter></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-customer>
+        <tr>
+            <td style="width: 100px;">
+                <button class="btn btn-danger btn-xs mr-2" (click)="delete(customer)"><i class="fa fa-trash"></i></button>
+                <button class="btn btn-primary btn-xs" (click)="edit(customer)"><i class="fa fa-edit"></i></button>
+            </td>
+            <td>{{customer.full_name}}</td>
+            <td>{{customer.email}}</td>
+            <td>{{customer.phone}}</td>
+            <td>{{customer.role.name}}</td>
+            <td>{{customer.parent.first_name+' '+customer.parent.last_name}}</td>
+            <td>{{customer.created_at | date : 'd-M-y h:mm:ss a'}}</td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog header="Add User" [(visible)]="display" [style]="{width: '50vw'}">
+    <form [formGroup]="registerForm" (ngSubmit)="!registerForm.invalid && registerUser()">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">First Name</label>
+                    <input
+                      formControlName="first_name"
+                      type="text"
+                      class="form-control"
+                      placeholder="First Name"
+                    />
+                    <div class="col-12" *ngIf="f.first_name.touched && f.first_name.invalid">
+                        <small *ngIf="f.first_name.errors?.required" class="p-error">First Name is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Last Name</label>
+                    <input
+                      formControlName="last_name"
+                      type="text"
+                      class="form-control"
+                      placeholder="Last Name"
+                    />
+                    <div class="col-12" *ngIf="f.last_name.touched && f.last_name.invalid">
+                        <small *ngIf="f.last_name.errors?.required" class="p-error">Last Name is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Email</label>
+                    <input
+                      formControlName="email"
+                      type="email"
+                      class="form-control"
+                      placeholder="Email"
+                    />
+                    <div class="col-12" *ngIf="f.email.touched && f.email.invalid">
+                        <small *ngIf="f.email.errors?.required" class="p-error">Email is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">phone</label>
+                    <input
+                      formControlName="phone"
+                      type="text"
+                      class="form-control"
+                      placeholder="phone"
+                    />
+                    <div class="col-12" *ngIf="f.phone.touched && f.phone.invalid">
+                        <small *ngIf="f.phone.errors?.required" class="p-error">phone is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Password</label>
+                    <input
+                      formControlName="password"
+                      type="password"
+                      class="form-control"
+                      placeholder="Password"
+                    />
+                    <div class="col-12" *ngIf="f.password.touched && f.password.invalid">
+                        <small *ngIf="f.password.errors?.required" class="p-error">Password is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Confirm Password</label>
+                    <input
+                      formControlName="confirm_password"
+                      type="password"
+                      class="form-control"
+                      placeholder="Confirm Password"
+                    />
+                    <div class="col-12" *ngIf="f.confirm_password.touched && f.confirm_password.invalid">
+                        <small *ngIf="f.confirm_password.errors?.required" class="p-error">Confirm Password is required.</small>
+                        
+                    </div>
+                    <small class="p-error" *ngIf="(!f.password.errors?.required && !f.confirm_password.errors?.required) && f.password.value!=f.confirm_password.value">Password doesn't match</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Role</label>
+                    <select
+                      formControlName="role_id"
+                      class="form-control"
+                      (change)="onSelectRole()"
+                    >
+                    <option [defaultSelected]=true [value]="null">Select Role</option>
+                    <option value="{{a.id}}" *ngFor="let a of roleList">{{a.name}}</option>
+                    </select>
+                    <div class="col-12" *ngIf="f.role_id.touched && f.role_id.invalid">
+                        <small *ngIf="f.role_id.errors?.required" class="p-error">Role is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="f.role_id.value==3 || f.role_id.value==4 || f.role_id.value==5 || f.role_id.value==8">
+                <div class="form-group">
+                    <label for="">Select {{(f.role_id.value==3)?'Branch Head':((f.role_id.value==4)?'Branch Sales Manager':((f.role_id.value==5)?'Sales Executive':'User'))}}</label>
+                    <select
+                      formControlName="parent_id"
+                      class="form-control"
+                      [disabled]="f.role_id.value==1 && f.role_id.value==2"
+                    >
+                    <option [defaultSelected]=true [value]="0">Select User</option>
+                    <option value="{{a.id}}" *ngFor="let a of userList">{{a.first_name}} {{a.last_name}}</option>
+                    </select>
+                    <div class="col-12" *ngIf="f.parent_id.touched && f.parent_id.invalid">
+                        <small *ngIf="f.parent_id.errors?.required" class="p-error">User is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="f.role_id.value==7">
+                <div class="form-group">
+                    <label for="">Bank Name</label>
+                    <input
+                      formControlName="bank_id"
+                      type="text"
+                      class="form-control"
+                      placeholder="Select Bank"
+                    />
+                    <div class="col-12" *ngIf="f.bank_id.touched && f.bank_id.invalid">
+                        <small *ngIf="f.bank_id.errors?.required" class="p-error">Bank is required.</small>  
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="f.role_id.value==7">
+                <div class="form-group">
+                    <label for="">State</label>
+                    <input
+                      formControlName="state_id"
+                      type="text"
+                      class="form-control"
+                      placeholder="Select State"
+                    />
+                    <div class="col-12" *ngIf="f.state_id.touched && f.state_id.invalid">
+                        <small *ngIf="f.state_id.errors?.required" class="p-error">State is required.</small>  
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" *ngIf="f.role_id.value==7">
+                <div class="form-group">
+                    <label for="">Branch</label>
+                    <input
+                      formControlName="branch"
+                      type="text"
+                      class="form-control"
+                      placeholder="Select Bank"
+                    />
+                    <div class="col-12" *ngIf="f.branch.touched && f.branch.invalid">
+                        <small *ngIf="f.branch.errors?.required" class="p-error">Branch is required.</small>  
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <button class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
