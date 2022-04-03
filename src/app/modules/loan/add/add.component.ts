@@ -19,7 +19,7 @@ import { MomService } from '@services/mom.service';
 import { LocationService } from '@services/location.service';
 import { ChannelService } from '@services/channel.service';
 import { UserService } from '@services/user.service';
-
+declare const $;
 @Component({
   selector: 'app-add',
   templateUrl: './add.component.html',
@@ -64,6 +64,7 @@ export class AddComponent implements OnInit, OnDestroy {
   salesExecutiveList: any=[];
   executiveList: any=[];
   branchHeadList: any=[];
+  doc_path:String='';
 
   constructor(
     private renderer: Renderer2,
@@ -84,12 +85,13 @@ export class AddComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.doc_path = this.globalService.env_config.api_php_public;
     this.buttons=[{
-      type:'button',class:'btn btn-danger',label:'Back',icon:'fa fa-back',disabled:false,action:'back',hidden:true
+      type:'button',class:'btn btn-danger',label:'Back',icon:'fa fa-back',disabled:false,action:'back',hidden:true,access:'edit'
     },{
-      type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset',hidden:false
+      type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset',hidden:false,access:'add'
     },{
-      type:'button',class:'btn btn-info',label:'Save',icon:'fa fa-save',disabled:false,action:'save',hidden:false
+      type:'button',class:'btn btn-info',label:'Save',icon:'fa fa-save',disabled:false,action:'save',hidden:false,access:'add'
     }];
     this.roleid = this.globalService.getUser.role_id;
     this.loanForm = new FormGroup({
@@ -172,15 +174,25 @@ export class AddComponent implements OnInit, OnDestroy {
       let id: any = this.globalService.getUser.id;
       this.f['channel_id'].setValue(id);
       this.through_channel=true;
-    } else {
-      this.loadChannel();
     }
-
+  }
+  
+  ngAfterViewInit() {
     if (this.route.snapshot.paramMap.has('id')) {
       let id: any = this.route.snapshot.paramMap.get('id');
       this.buttons[0].hidden = false;
       this.buttons[1].hidden = true;
       this.edit(id);
+    }
+    else if (this.route.snapshot.paramMap.has('viewid')) {
+      let id: any = this.route.snapshot.paramMap.get('viewid');
+      this.buttons[0].hidden = false;
+      this.buttons[1].hidden = true;
+      this.buttons[2].hidden = true;
+      this.edit(id);
+      this.loanForm.disable();
+      this.loanForm.controls['applicants'].disable();
+      //$('.form-control').addClass('disabled');
     }
     else  {
       this.addApplicant();
@@ -193,7 +205,7 @@ export class AddComponent implements OnInit, OnDestroy {
           break;
       case 'save':this.save();
           break;
-      case 'back':this.router.navigate(['/Admin/loan/']);
+      case 'back':this.router.navigate(['/Admin/loan/application']);
           break;
       default:return true;
     }
@@ -271,14 +283,17 @@ export class AddComponent implements OnInit, OnDestroy {
       }
 
       for(let i in this.KYCDocs._files) {
+        if(this.KYCDocs._files[i]['id']) continue;
         formData.append('kyc_files[]', this.KYCDocs._files[i]);
       }
 
       for(let i in this.FinanceDocs._files) {
+        if(this.FinanceDocs._files[i]['id']) continue;
         formData.append('finance_files[]', this.FinanceDocs._files[i]);
       }
 
       for(let i in this.OtherDocs._files) {
+        if(this.OtherDocs._files[i]['id']) continue;
         formData.append('other_files[]', this.OtherDocs._files[i]);
       }
 
@@ -313,29 +328,102 @@ export class AddComponent implements OnInit, OnDestroy {
     
   }
 
-  edit(id){
+  async edit(id){
     this.clear();
     this.display=true;
-    this.loanService.getDetailById({
+    await this.loanService.getDetailById({
       id:id
     }).subscribe((res)=>{
       if(res.status) {
-        this.loanForm.controls['name'].setValue(res.data.name);
-        this.loanForm.controls['email'].setValue(res.data.email);
-        this.loanForm.controls['phone'].setValue(res.data.phone);
-        this.loanForm.controls['pan'].setValue(res.data.pan);
-        this.loanForm.controls['pincode'].setValue(res.data.pincode);
-        this.loanForm.controls['gst'].setValue(res.data.gst);
+        this.loanForm.controls['channel_id'].setValue(res.data.channel_id);
+        this.loanForm.controls['loan_option_type'].setValue(res.data.loan_option_type);
+        this.loanForm.controls['loan_type'].setValue(res.data.loan_type);
+        this.loanForm.controls['loan_other_type'].setValue(res.data.loan_other_type);
+        this.loanForm.controls['annual_pat'].setValue(res.data.annual_pat);
+        this.loanForm.controls['annual_pat_inlakhs'].setValue(res.data.annual_pat_inlakhs);
+        this.loanForm.controls['loan_amount'].setValue(res.data.loan_amount);
+        this.loanForm.controls['loan_amount_inlakhs'].setValue(res.data.loan_amount_inlakhs);
+        this.loanForm.controls['loan_product_group'].setValue(res.data.loan_product_group);
+        this.loanForm.controls['property_type'].setValue(res.data.property_type);
+        this.loanForm.controls['annual_turnover'].setValue(res.data.annual_turnover);
+        this.loanForm.controls['annual_turnover_inlakhs'].setValue(res.data.annual_turnover_inlakhs);
+        this.loanForm.controls['loan_usage_type'].setValue(res.data.loan_usage_type);
+        this.loanForm.controls['loan_sub_type'].setValue(res.data.loan_sub_type);
+        this.loanForm.controls['business_type'].setValue(res.data.business_type);
+        this.loanForm.controls['business_name'].setValue(res.data.business_name);
+        this.loanForm.controls['business_years'].setValue(res.data.business_years);
+        this.loanForm.controls['business_years_inyear'].setValue(res.data.business_years_inyear);
+        this.loanForm.controls['business_gst'].setValue(res.data.business_gst);
+        this.loanForm.controls['business_pincode'].setValue(res.data.business_pincode);
+        this.loanForm.controls['business_location'].setValue(res.data.business_location);
+        this.loanForm.controls['business_city'].setValue(res.data.business_city);
+        this.loanForm.controls['business_state'].setValue(res.data.business_state);
+        this.loanForm.controls['business_address_line_1'].setValue(res.data.business_address_line_1);
+        this.loanForm.controls['business_address_line_2'].setValue(res.data.business_address_line_2);
+        this.loanForm.controls['existing_profile'].setValue(res.data.existing_profile);
+        this.loanForm.controls['borrower_type'].setValue(res.data.borrower_type);
+        this.loanForm.controls['net_income'].setValue(res.data.net_income);
+        this.loanForm.controls['net_income_inlakhs'].setValue(res.data.net_income_inlakhs);
+        this.loanForm.controls['gross_income'].setValue(res.data.gross_income);
+        this.loanForm.controls['gross_income_inlakhs'].setValue(res.data.gross_income_inlakhs);
 
-        for(let bank of res.data.banks) {
-          this.t.push(this.formBuilder.group({
-            bank: new FormControl(bank.bank, [Validators.nullValidator]),    
-            branchname: new FormControl(bank.branchname, [Validators.nullValidator]),    
-            accountno: new FormControl(bank.accountno, [Validators.nullValidator]),    
-            accounttype: new FormControl(bank.accounttype, [Validators.nullValidator]),    
-            ifsccode: new FormControl(bank.ifsccode, [Validators.nullValidator])
-          }));
+        let executive_list = res.data.executive_list;
+
+        if(executive_list!=null) {
+          this.loanForm.controls['executive'].setValue(executive_list.id);
+          this.loadChannel();
+          if(this.loanForm.controls['sales_executive']) {
+            this.loanForm.controls['sales_executive'].setValue(executive_list.parent.id);
+            this.loadUser(4,executive_list.parent.id);
+          }
+          if(this.loanForm.controls['b_sales_manager']) {
+            this.loanForm.controls['b_sales_manager'].setValue(executive_list.parent.parent.id);
+            this.loadUser(3,executive_list.parent.parent.id);
+          }
+          if(this.loanForm.controls['b_head']) {
+            this.loanForm.controls['b_head'].setValue(executive_list.parent.parent.parent.id);   
+            this.loadUser(2,executive_list.parent.parent.parent.id);
+          } 
         }
+
+        for(let applicant of res.data.applicants){
+          this.t.push(this.formBuilder.group({
+            fname: new FormControl(applicant.fname, [Validators.nullValidator]),
+            lname: new FormControl(applicant.lname, [Validators.nullValidator]),
+            email: new FormControl(applicant.email, [Validators.nullValidator]),
+            phone_1: new FormControl(applicant.phone_1, [Validators.nullValidator]),
+            phone_2: new FormControl(applicant.phone_2, [Validators.nullValidator]),
+            pincode: new FormControl(applicant.pincode, [Validators.nullValidator]),
+            locality: new FormControl(applicant.locality, [Validators.nullValidator]),
+            city: new FormControl(applicant.city, [Validators.nullValidator]),
+            state: new FormControl(applicant.state, [Validators.nullValidator])
+          }));
+          this.loadLocation('city',applicant.state);
+        }
+
+        if(res.data.business_state>0) {
+          this.loadLocation('city',res.data.business_state);
+        }
+
+        if(res.data.documents) {
+          this.KYCDocs._files = res.data.documents.filter((a)=>{
+            return a.doc_type=='kyc';
+          }).map((b)=>{
+            return {'name':b.file_name,'size':b.size,'id':b.id,'objectURL':b.url};
+          });
+          this.FinanceDocs._files = res.data.documents.filter((a)=>{
+            return a.doc_type=='finance';
+          }).map((b)=>{
+            return {'name':b.file_name,'size':b.size,'id':b.id,'objectURL':b.url};
+          });
+          this.OtherDocs._files = res.data.documents.filter((a)=>{
+            return a.doc_type=='other';
+          }).map((b)=>{
+            return {'name':b.file_name,'size':b.size,'id':b.id,'objectURL':b.url};
+          });
+        }
+        
+
         this.selectedId = res.data.id;
       }
     })
@@ -351,8 +439,8 @@ export class AddComponent implements OnInit, OnDestroy {
   }
 
   onSelectFile(event){
-    console.log(event.files);
-    console.log(this.KYCDocs);
+    //console.log(event.files);
+    //console.log(this.KYCDocs);
     //this.KYCDocs._files.splice(1,1)
   }
 

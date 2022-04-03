@@ -4,30 +4,37 @@
     [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading" [globalFilterFields]="['ref_no','applicant_name','sales_person_lbl', 'created_at']" styleClass="p-datatable-gridlines" responsiveLayout="scroll">
     <ng-template pTemplate="header">
         <tr>
-            <th style="width: 130px;">Action</th>
+            <th style="width: 140px;">Action</th>
             <th pSortableColumn="ref_no">#REF No. <p-sortIcon field="ref_no"></p-sortIcon></th>
             <th pSortableColumn="applicant_name">Business Name <p-sortIcon field="applicant_name"></p-sortIcon></th>
             <th pSortableColumn="sales_person_lbl">Sales Person <p-sortIcon field="sales_person_lbl"></p-sortIcon></th>
             <th *ngIf="pagetype!='application'">Lenders</th>
             <th pSortableColumn="created_at">Applied Date <p-sortIcon field="created_at"></p-sortIcon></th>
+            <th *ngIf="pagetype=='disbursed'">Disbursed Date</th>
+            <th *ngIf="pagetype=='disbursed'">Disbursed By</th>
+            <th>Documents</th>
         </tr>
         <tr>
-            <th style="width: 130px;">
+            <th style="width: 140px;">
             </th>
             <th><p-columnFilter type="text" field="ref_no"></p-columnFilter></th>
             <th><p-columnFilter type="text" field="applicant_name"></p-columnFilter></th>
             <th><p-columnFilter type="text" field="sales_person_lbl"></p-columnFilter></th>
             <th *ngIf="pagetype!='application'"></th>
             <th><p-columnFilter type="text" field="created_at"></p-columnFilter></th>
+            <th *ngIf="pagetype=='disbursed'"><p-columnFilter type="text" field="disbursed_at"></p-columnFilter></th>
+            <th *ngIf="pagetype=='disbursed'"><p-columnFilter type="text" field="disbursed_lbl"></p-columnFilter></th>
+            <th></th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-loan>
         <tr>
-            <td style="width: 130px;">
-                <button class="btn btn-primary btn-xs mr-1" (click)="edit(loan)" title="Edit Loan"><i class="fa fa-edit"></i></button>
-                <button class="btn btn-info btn-xs mr-1" title="View Loan"><i class="fa fa-eye"></i></button>
-                <button class="btn btn-success btn-xs mr-1" title="Change Sales Person"><i class="fa fa-user"></i></button>
-                <button class="btn btn-warning btn-xs text-white" title="Assign Lender" (click)="assignLoan(loan)"><strong>L</strong></button>
+            <td style="width: 140px;">
+                <button class="btn btn-primary btn-xs mr-1" (click)="edit(loan)" title="Edit Loan" *ngIf="pagetype!='disbursed'"><i class="fa fa-edit"></i></button>
+                <a class="btn btn-info btn-xs mr-1" title="View Loan" [href]="'#/Admin/loan/view/'+loan.id" target="_blank"><i class="fa fa-eye"></i></a>
+                <button class="btn btn-success btn-xs mr-1" title="Change Sales Person"  (click)="assignSalesPerson(loan)" *ngIf="pagetype!='disbursed'"><i class="fa fa-user"></i></button>
+                <button class="btn btn-warning btn-xs text-white mr-1" title="Assign Lender" (click)="assignLoan(loan)" *ngIf="pagetype!='disbursed'"><strong>L</strong></button>
+                <button class="btn btn-danger btn-xs text-white" title="Disbursed" (click)="disbursedLoan(loan)" *ngIf="pagetype!='application'"><strong>D</strong></button>
             </td>
             <td>{{loan.ref_no}}</td>
             <td>{{loan.applicant_name}}</td>
@@ -40,11 +47,14 @@
                 </ul>
             </td>
             <td>{{loan.created_at | date : 'd-M-y h:mm:ss a'}}</td>
+            <td *ngIf="pagetype=='disbursed'">{{loan.disbursed_at | date : 'd-M-y h:mm:ss a'}}</td>
+            <td *ngIf="pagetype=='disbursed'">{{loan.disbursed_lbl}}</td>
+            <td class="text-center"><a [href]="doc_path+'/api/loan/download/'+loan.id"><i class="fa fa-download"></i></a></td>
         </tr>
     </ng-template>
 </p-table>
 
-<p-dialog header="Loan Assignment" [(visible)]="displayLoanAssignDialog">
+<p-dialog header="Loan Assignment" [(visible)]="displayLoanAssignDialog" [style]="{width: '40vw'}">
     <form [formGroup]="assignForm" (ngSubmit)="!assignForm.invalid && saveAssign()">
     <div class="row" style="max-height:80vh">
         <div class="col-md-12">
@@ -84,7 +94,7 @@
                     <td>
                         <select formControlName="bank_user_id" class="form-control" required>
                             <option value="">-- Select --</option>
-                            <option value="{{user.id}}" *ngFor="let user of lender.controls.lenderList.value">{{user.name}}</option>
+                            <option value="{{user.id}}" *ngFor="let user of lender.controls.lenderList.value">{{user.full_name}}</option>
                         </select>
                         <div class="col-12" *ngIf="lender.controls.bank_user_id.touched && lender.controls.bank_user_id.invalid">
                             <small *ngIf="lender.controls.bank_user_id.errors?.required" class="p-error">Lender is required.</small>
@@ -107,9 +117,222 @@
                 <label for="binary">Send Email</label>
             </div>
         </div> -->
-        <div class="col-md-6 text-right">
-            <button class="btn btn-primary">Assign & Update</button>
+        <div class="col-md-12 text-right">
+            <button class="btn btn-primary" [disabled]="assignForm.invalid">Assign & Update</button>
         </div>
     </div>
+    </form>
+</p-dialog>
+
+<p-dialog header="Assign Sales Person" [(visible)]="displaySalesPersonAssignDialog" [style]="{width: '40vw'}">
+    <form [formGroup]="salesAssignForm" (ngSubmit)="!salesAssignForm.invalid && saveSalesAssign()">
+        <div class="row">
+            <div class="col-md-12" *ngIf="roleid<=1">
+                <div class="form-group">
+                    <label for="">Select Branch Head</label>
+                    <select formControlName="b_head" class="form-control" (change)="loadUser(2,f1.b_head.value)">
+                        <option value="">-- Select --</option>
+                        <option value="{{user.id}}" *ngFor="let user of branchHeadList">{{user.first_name}}</option>
+                    </select>
+                    <div class="col-12" *ngIf="f1.b_head.touched && f1.b_head.invalid">
+                        <small *ngIf="f1.b_head.errors?.required" class="p-error">Branch Head is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" *ngIf="roleid<=2">
+                <div class="form-group">
+                    <label for="">Select Branch Sales Manager</label>
+                    <select formControlName="b_sales_manager" class="form-control" (change)="loadUser(3,f1.b_sales_manager.value)">
+                        <option value="">-- Select --</option>
+                        <option value="{{user.id}}" *ngFor="let user of salesManagerList">{{user.first_name}}</option>
+                    </select>
+                    <div class="col-12" *ngIf="f1.b_sales_manager.touched && f1.b_sales_manager.invalid">
+                        <small *ngIf="f1.b_sales_manager.errors?.required" class="p-error">Branch Sales Manager is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" *ngIf="roleid<=3">
+                <div class="form-group">
+                    <label for="">Select Sales Executive</label>
+                    <select formControlName="sales_executive" class="form-control" (change)="loadUser(4,f1.sales_executive.value)">
+                        <option value="">-- Select --</option>
+                        <option value="{{user.id}}" *ngFor="let user of salesExecutiveList">{{user.full_name}}</option>
+                    </select>
+                    <div class="col-12" *ngIf="f1.sales_executive.touched && f1.sales_executive.invalid">
+                        <small *ngIf="f1.sales_executive.errors?.required" class="p-error">Sales Executive is required.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" *ngIf="roleid<=4">
+                <div class="form-group">
+                    <label for="">Select Executive</label>
+                    <select formControlName="executive" class="form-control">
+                        <option value="">-- Select --</option>
+                        <option value="{{user.id}}" *ngFor="let user of executiveList">{{user.full_name}}</option>
+                    </select>
+                    <div class="col-12" *ngIf="f1.executive.touched && f1.executive.invalid">
+                        <small *ngIf="f1.executive.errors?.required" class="p-error">Executive is required.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <input type="hidden" formControlName="loan_id">
+                <input type="hidden" formControlName="channel_id">
+                <button class="btn btn-primary" [disabled]="salesAssignForm.invalid">Assign & Update</button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-dialog header="Loan Disbursement" [(visible)]="displayLoanDisbursedDialog" [style]="{width: '40vw'}">
+    <form [formGroup]="disbursedForm" (ngSubmit)="!disbursedForm.invalid && saveLoanDisbursment()">
+        <p-tabView>
+            <p-tabPanel header="Disburse Details">
+               <div class="row">
+                   <div class="col-md-12">
+                       <div class="form-group">
+                           <label for="">Loan Status</label>
+                            <select formControlName="loan_status" class="form-control">
+                                <option value="null">-- Select --</option>
+                                <option value="approve">Approve</option>
+                                <option value="onhold">On Hold</option>
+                                <option value="reject">Reject</option>
+                                <option value="disbursed">Disbursed</option>
+                            </select>
+                       </div>
+                        <div class="form-group">
+                            <label for="" class="d-block">Disbursement Date</label>
+                            <p-calendar formControlName="disbursed_date" [style]="{'width':'100%'}"></p-calendar>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="d-block">Channel Payout %</label>
+                            <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="channel_payout_percent" [inputStyle]="{'width':'483px'}"
+                            ></p-inputNumber>
+                            <!-- <input type="text" class="form-control" formControlName="channel_payout_percent"> -->
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="d-block">Lender Payout %</label>
+                            <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="lender_payout_percent" [inputStyle]="{'width':'483px'}"
+                            ></p-inputNumber>
+                            <!-- <input type="text" class="form-control" formControlName="lender_payout_percent"> -->
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="d-block">Sanctioned Amount</label>
+                            <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="sanctioned_amount" [inputStyle]="{'width':'483px'}"
+                            ></p-inputNumber>
+                            <!-- <input type="text" class="form-control" formControlName="sanctioned_amount"> -->
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="d-block">Sanctioned Processing Fee Percentage/Amount</label>
+                            <p-inputNumber mode="decimal" locale="en-IN" [minFractionDigits]="2"
+                                  formControlName="processing_fee" [inputStyle]="{'width':'483px'}"
+                            ></p-inputNumber>
+                            <!-- <input type="text" class="form-control" formControlName="processing_fee"> -->
+                        </div>
+                        <div class="form-group">
+                            <label for="">Lender Loan Id</label>
+                            <input type="text" class="form-control" formControlName="lender_loan_id">
+                        </div>
+                    </div>
+               </div>
+            </p-tabPanel>
+            <p-tabPanel header="Upload Documents">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="">Upload Loan Repayment Schedule Documents</label>
+                        <small class="d-block">(Supported Documents : pdf,doc,docx,xls,png,jpg,jpeg,txt)</small>
+                        <p-fileUpload multiple="multiple" [showUploadButton]="false" (onSelect)="onSelectFile($event)"  #loanRepayDoc>
+                            <ng-template pTemplate="file"></ng-template>
+                            <ng-template pTemplate="content">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th style="width:120px">Size</th>
+                                        <th style="width:80px">View</th>
+                                        <th style="width:80px">Remove</th>
+                                    </tr>
+                                    <tr *ngFor="let file of loanRepayDoc._files;let i=index">
+                                        <td>{{file.name}}</td>
+                                        <td>{{global.humanFileSize(file.size)}}</td>
+                                        <td class="text-center"><a type="button" class="btn btn-info btn-xs" href="{{(selectedId>0)? doc_path+file.objectURL:(file.objectURL==undefined ? '':file.objectURL.changingThisBreaksApplicationSecurity)}}" target="_BLANK"><i class="fa fa-eye"></i></a></td>
+                                        <td class="text-center"><button type="button" class="btn btn-danger btn-xs" (click)="removeDocument(loanRepayDoc,i)"><i class="pi pi-times"></i></button></td>
+                                    </tr>
+                                </table>
+                            </ng-template>
+                        </p-fileUpload>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="">Upload Channel Partner Invoices</label>
+                        <small class="d-block">(Supported Documents : pdf,doc,docx,xls,png,jpg,jpeg,txt)</small>
+                        <p-fileUpload multiple="multiple" [showUploadButton]="false" (onSelect)="onSelectFile($event)"  #channelInvoiceDoc>
+                            <ng-template pTemplate="file"></ng-template>
+                            <ng-template pTemplate="content">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th style="width:120px">Size</th>
+                                        <th style="width:80px">View</th>
+                                        <th style="width:80px">Remove</th>
+                                    </tr>
+                                    <tr *ngFor="let file of channelInvoiceDoc._files;let i=index">
+                                        <td>{{file.name}}</td>
+                                        <td>{{global.humanFileSize(file.size)}}</td>
+                                        <td class="text-center"><a type="button" class="btn btn-info btn-xs" href="{{(selectedId>0)? doc_path+file.objectURL:(file.objectURL==undefined ? '':file.objectURL.changingThisBreaksApplicationSecurity)}}" target="_BLANK"><i class="fa fa-eye"></i></a></td>
+                                        <td class="text-center"><button type="button" class="btn btn-danger btn-xs" (click)="removeDocument(channelInvoiceDoc,i)"><i class="pi pi-times"></i></button></td>
+                                    </tr>
+                                </table>
+                            </ng-template>
+                        </p-fileUpload>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="">Upload Lender Confirmation Documents</label>
+                        <small class="d-block">(Supported Documents : pdf,doc,docx,xls,png,jpg,jpeg,txt)</small>
+                        <p-fileUpload multiple="multiple" [showUploadButton]="false" (onSelect)="onSelectFile($event)"  #llcDoc>
+                            <ng-template pTemplate="file"></ng-template>
+                            <ng-template pTemplate="content">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th style="width:120px">Size</th>
+                                        <th style="width:80px">View</th>
+                                        <th style="width:80px">Remove</th>
+                                    </tr>
+                                    <tr *ngFor="let file of llcDoc._files;let i=index">
+                                        <td>{{file.name}}</td>
+                                        <td>{{global.humanFileSize(file.size)}}</td>
+                                        <td class="text-center"><a type="button" class="btn btn-info btn-xs" href="{{(selectedId>0)? doc_path+file.objectURL:(file.objectURL==undefined ? '':file.objectURL.changingThisBreaksApplicationSecurity)}}" target="_BLANK"><i class="fa fa-eye"></i></a></td>
+                                        <td class="text-center"><button type="button" class="btn btn-danger btn-xs" (click)="removeDocument(llcDoc,i)"><i class="pi pi-times"></i></button></td>
+                                    </tr>
+                                </table>
+                            </ng-template>
+                        </p-fileUpload>
+                    </div>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Remark">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Remark</label>
+                            <textarea class="form-control" formControlName="remark"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <p-divider></p-divider>
+                    </div>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+        <div class="row">
+            <div class="col-md-12 text-right pt-3">
+                <input type="hidden" formControlName="loan_id">
+                <button class="btn btn-primary" [disabled]="disbursedForm.invalid">Update Disbursment</button>
+            </div>
+        </div>
     </form>
 </p-dialog>

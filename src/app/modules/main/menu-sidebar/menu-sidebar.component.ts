@@ -21,10 +21,10 @@ export class MenuSidebarComponent implements OnInit {
     }
 
     loadMenu(){
-        this.menuService.getAll().subscribe((res:any)=>{
-            if(res.resultKey==1)
+        this.menuService.list().subscribe((res:any)=>{
+            if(res.status)
             {
-                this.generateData(res.resultValue);
+                this.generateData(res.data);
             }
             else {
                 this.menu=[];

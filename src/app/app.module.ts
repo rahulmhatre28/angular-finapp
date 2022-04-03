@@ -43,6 +43,9 @@ import { DialogModule } from 'primeng/dialog';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { SharedModule } from '@modules/shared/shared.module';
 import {ChartModule} from 'primeng/chart';
+import { AccessComponent } from './pages/access/access.component';
+import { CalendarModule } from 'primeng/calendar';
+import { DropdownModule } from 'primeng/dropdown';
 registerLocaleData(localeEn, 'en-EN');
 
 @NgModule({
@@ -72,7 +75,8 @@ registerLocaleData(localeEn, 'en-EN');
         DropdownMenuComponent,
         RoleComponent,
         GroupByPipe,
-        UsersComponent
+        UsersComponent,
+        AccessComponent
     ],
     imports: [
         BrowserModule,
@@ -90,7 +94,9 @@ registerLocaleData(localeEn, 'en-EN');
         DialogModule,
         InputSwitchModule,
         SharedModule,
-        ChartModule
+        ChartModule,
+        CalendarModule,
+        DropdownModule
     ],
     providers: [GlobalService,ApiService,AuthService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
     bootstrap: [AppComponent],

@@ -23,7 +23,7 @@ export class ViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.buttons=[{
-      type:'button',class:'btn btn-info',label:'Add',icon:'fa fa-plus',disabled:false,action:'add'
+      type:'button',class:'btn btn-info',label:'Add',icon:'fa fa-plus',disabled:false,action:'add',access:'add'
     }];
   }
 

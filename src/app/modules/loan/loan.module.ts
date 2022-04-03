@@ -22,6 +22,8 @@ import {FileUploadModule} from 'primeng/fileupload';
 import { InputNumberModule } from 'primeng/inputnumber';
 import {InputMaskModule} from 'primeng/inputmask';
 import { ViewComponent } from './view/view.component';
+import { CalendarModule } from 'primeng/calendar';
+import {DividerModule} from 'primeng/divider';
 
 @NgModule({
   declarations: [
@@ -49,7 +51,9 @@ import { ViewComponent } from './view/view.component';
     TabViewModule,
     FileUploadModule,
     InputNumberModule,
-    InputMaskModule
+    InputMaskModule,
+    CalendarModule,
+    DividerModule
   ],
   exports: []
 

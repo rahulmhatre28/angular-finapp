@@ -15,4 +15,12 @@ export class MenuService {
         return this.dataservice.post('/menu', req);
     }
 
+    getByParams(req:any) {
+        return this.dataservice.get('/menu/:key/:value', req);
+    }
+
+    list(req: any=null) {
+        return this.dataservice.get('/menu/list', req);
+    }
+
 }

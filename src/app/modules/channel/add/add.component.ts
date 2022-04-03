@@ -57,11 +57,11 @@ export class AddComponent implements OnInit, OnDestroy {
     }
     this.roleid = this.globalService.getUser.role_id;
     this.buttons=[{
-      type:'button',class:'btn btn-danger',label:'Back',icon:'fa fa-back',disabled:false,action:'back',hidden:true
+      type:'button',class:'btn btn-danger',label:'Back',icon:'fa fa-back',disabled:false,action:'back',hidden:true,access:'edit'
     },{
-      type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset',hidden:false
+      type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset',hidden:false,access:'add'
     },{
-      type:'button',class:'btn btn-info',label:'Save',icon:'fa fa-save',disabled:false,action:'save',hidden:false
+      type:'button',class:'btn btn-info',label:'Save',icon:'fa fa-save',disabled:false,action:'save',hidden:false,access:'add'
     }];
     this.registerForm = new FormGroup({
       name: new FormControl(null, Validators.required),

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router,Event } from '@angular/router';
+import { GlobalService } from '@services/global.service';
 import { filter, distinctUntilChanged } from 'rxjs/operators';
 interface IBreadCrumb {
   label: string;
@@ -16,18 +17,28 @@ export class BreadcrumbComponent implements OnInit {
   public breadcrumbs:IBreadCrumb[];
   @Output() onAction: EventEmitter<any> = new EventEmitter();
   @Input('buttons') buttons: any = [];
+
+  menuAction:any=[];
   
-  constructor(private activatedRoute: ActivatedRoute,private router: Router) { 
+  constructor(private activatedRoute: ActivatedRoute,private router: Router,private globalService:GlobalService) { 
     this.breadcrumbs = this.buildBreadCrumb(this.activatedRoute.root);
   }
 
   ngOnInit(): void {
+    this.menuAction = this.globalService.getMenuActions();
     this.router.events.pipe(
       filter((event: Event) => event instanceof NavigationEnd),
       distinctUntilChanged(),
     ).subscribe(() => {
         this.breadcrumbs = this.buildBreadCrumb(this.activatedRoute.root);
-    })
+    });
+
+    for(let index in this.buttons) {
+      if(!this.menuAction.includes(this.buttons[index].access)){
+        this.buttons[index]['hidden']=true;
+      }
+    }    
+
   }
 
   action(item){

@@ -15,6 +15,7 @@ import {MainMenuComponent} from '@pages/main-menu/main-menu.component';
 import {SubMenuComponent} from '@pages/main-menu/sub-menu/sub-menu.component';
 import { RoleComponent } from '@pages/role/role.component';
 import { UsersComponent } from '@modules/users/users.component';
+import { AccessComponent } from '@pages/access/access.component';
 
 const routes: Routes = [
     {
@@ -31,10 +32,10 @@ const routes: Routes = [
                 }
             },
             {
-                path: 'blank',
-                component: BlankComponent,
+                path: '500',
+                component: AccessComponent,
                 data:{
-                    breadcrumb:'Profile'
+                    breadcrumb:'Access Denied'
                 }
             },
             {
@@ -74,24 +75,35 @@ const routes: Routes = [
                 path: 'Admin/loan', 
                 loadChildren: () => import('./modules/loan/loan.module').then(m => m.LoanModule) 
             },
+            { 
+                path: 'Admin/upload', 
+                loadChildren: () => import('./modules/upload/upload.module').then(m => m.UploadModule) 
+            },
+            { 
+                path: 'Admin/report', 
+                loadChildren: () => import('./modules/report/report.module').then(m => m.ReportModule) 
+            },
             {
                 path: 'users',
                 data:{
-                    breadcrumb:'Users' 
+                    breadcrumb:'Users',
+                    code:'user'
                 },
                 children:[
                     {
                         path: 'list',
                         component: UsersComponent,
                         data:{
-                            breadcrumb:'User List'
+                            breadcrumb:'User List',
+                            code:'v_user'
                         }
                     },
                     {
                         path: 'role',
                         component: RoleComponent,
                         data:{
-                            breadcrumb:'Role'
+                            breadcrumb:'Role',
+                            code:'role'
                         }
                     }
                 ]

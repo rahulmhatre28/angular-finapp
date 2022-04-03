@@ -130,9 +130,32 @@ export class ApiService {
   putFile(url: string,objParams: FormData): Observable<any> {
     this.globalService.showLoader();
     url = this.config.api_php + url;
-    return this.http.put(url, objParams, {headers:{
+    return this.http.post(url, objParams, {headers:{
       'User-id':this.globalService.getUser.id.toString()
     }}).pipe(map((data: any) => {
+      return data;
+    })).pipe(
+      catchError((err) => {
+        if (err.status == 401) {
+          this.globalService.logout();
+        }
+        return throwError(err);
+      })
+    ).pipe(finalize(() => {
+      this.globalService.hideLoader();
+    }));
+  }
+  
+  upload(url: string,objParams: FormData): Observable<any> {
+    this.globalService.showLoader();
+    url = this.config.api_php + url;
+    return this.http.post(url, objParams, {
+      headers:{
+      'User-id':this.globalService.getUser.id.toString()
+      },
+      reportProgress: true,
+      observe: 'events'
+    }).pipe(map((data: any) => {
       return data;
     })).pipe(
       catchError((err) => {

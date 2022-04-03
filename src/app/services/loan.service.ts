@@ -16,7 +16,7 @@ export class LoanService {
     }
 
     put(req: any,id:number) {
-        return this.dataservice.putFile('/loan/'+id, req);
+        return this.dataservice.putFile('/loan/update/'+id, req);
     }
 
     getDetailById(req:any=null) {
@@ -36,7 +36,14 @@ export class LoanService {
     }
 
     assign(req:any){
-        return this.dataservice.postFile('/loan/assign', req);
+        return this.dataservice.post('/loan/assign', req);
+    }
+    assignSalesPerson(req:any){
+        return this.dataservice.post('/loan/assignperson', req);
+    }
+
+    disbursed(req:any){
+        return this.dataservice.postFile('/loan/disbursed', req);
     }
 
 }

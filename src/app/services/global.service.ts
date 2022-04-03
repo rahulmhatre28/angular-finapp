@@ -10,6 +10,8 @@ import {AuthService} from "@services/auth.service";
 })
 export class GlobalService {
   public is_loading: boolean = false;
+  currentMenu: any;
+  menuActions: any;
 
   constructor(private router: Router) {
   }
@@ -61,5 +63,21 @@ export class GlobalService {
     let round = Math.round(num)
     num = round < 10 ? num.toFixed(2) : round < 100 ? num.toFixed(1) : round
     return `${num} ${'KMGTPEZY'[i-1]}B`
-}
+  }
+
+  setCurrentMenu(value) {
+    this.currentMenu = value;
+  }
+
+  getCurrentMenu() {
+    return this.currentMenu;
+  }
+
+  setMenuActions(value) {
+    this.menuActions = value.split(',');
+  }
+
+  getMenuActions() {
+    return this.menuActions;
+  }
 }

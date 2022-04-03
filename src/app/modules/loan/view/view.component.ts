@@ -5,12 +5,17 @@ import { LoanService } from '@services/loan.service';
 import { LazyLoadEvent } from 'primeng/api';
 import {ToastrService} from 'ngx-toastr';
 import { Table } from 'primeng/table';
+import { BankService } from '@services/bank.service';
+import { GlobalService } from '@services/global.service';
+import { UserService } from '@services/user.service';
+import { FileUpload } from 'primeng/fileupload';
+import moment from 'moment';
 
 @Component({
   selector: 'app-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  providers:[LoanService]
+  providers:[LoanService, BankService, UserService]
 })
 export class ViewComponent implements OnInit {
   loanList: any=[];
@@ -23,41 +28,60 @@ export class ViewComponent implements OnInit {
   buttons: any = [];
   displayLoanAssignDialog:boolean=false;
   public assignForm: FormGroup;
+  public salesAssignForm: FormGroup;
+  public disbursedForm:FormGroup;
   lenderList:any=[];
-  bankList:any=[{
-    id:1,
-    name:'HDFC Bank',
-    lenderList:[{
-      id:1,
-      name:'Rahul Mhatre'
-    },{
-      id:2,
-      name:'Sameer Patil'
-    }],
-  },
-  {
-    id:2,
-    name:'IDBI Bank',
-    lenderList:[{
-      id:3,
-      name:'Prashant Mhatre'
-    }]
-  }];
+  bankList:any=[];
+  // bankList:any=[{
+  //   id:1,
+  //   name:'HDFC Bank',
+  //   lenderList:[{
+  //     id:1,
+  //     full_name:'Rahul Mhatre'
+  //   },{
+  //     id:2,
+  //     full_name:'Sameer Patil'
+  //   }],
+  // },
+  // {
+  //   id:2,
+  //   name:'IDBI Bank',
+  //   lenderList:[{
+  //     id:3,
+  //     name:'Prashant Mhatre'
+  //   }]
+  // }];
   bank:any='';
   pagetype:String='application';
   @ViewChild(Table) table: Table;
+  roleid: number;
+  branchHeadList: any=[];
+  salesManagerList: any=[];
+  salesExecutiveList: any=[];
+  executiveList: any=[];
+  displaySalesPersonAssignDialog:boolean=false;
+  displayLoanDisbursedDialog:boolean=false;
+  selectedId:number=0;
+  doc_path: string='';
+
+  @ViewChild('loanRepayDoc') loanRepayDoc : FileUpload;
+  @ViewChild('channelInvoiceDoc') channelInvoiceDoc : FileUpload;
+  @ViewChild('llcDoc') llcDoc : FileUpload;
 
 
-  constructor(private loanService:LoanService,private router:Router, private formBuilder: FormBuilder,private toastr: ToastrService,private activatedRoute:ActivatedRoute) { }
+  constructor(private loanService:LoanService,private router:Router, private formBuilder: FormBuilder,private toastr: ToastrService,private activatedRoute:ActivatedRoute, private bankService:BankService,public global:GlobalService,private userService:UserService) { }
 
   ngOnInit(): void {
+    this.doc_path = this.global.env_config.api_php_public;
+    this.roleid = this.global.getUser.role_id;
     if(this.activatedRoute.snapshot.data.type){
       this.pagetype = this.activatedRoute.snapshot.data.type;
     }
-
+    this.loadLenders();
+    this.loadUser(this.roleid,this.global.getUser.id);
 
     this.buttons=[{
-      type:'button',class:'btn btn-info',label:'Add',icon:'fa fa-plus',disabled:false,action:'add'
+      type:'button',class:'btn btn-info',label:'Add',icon:'fa fa-plus',disabled:false,action:'add',access:'add'
     }];
     this.assignForm = new FormGroup({
       loan_id: new FormControl(0, Validators.required),
@@ -66,6 +90,37 @@ export class ViewComponent implements OnInit {
       lenders:  new FormArray([]),
       bank: new FormControl('',Validators.nullValidator),
       //is_email_to_be_send: new FormControl(false,Validators.nullValidator)
+    });
+
+    this.salesAssignForm = new FormGroup({
+      loan_id: new FormControl(0, Validators.required),
+      channel_id: new FormControl(0, Validators.nullValidator),
+    });
+
+    if(this.roleid == 1) {
+      
+      this.salesAssignForm.addControl('b_head',new FormControl('', [Validators.required]));
+      this.salesAssignForm.addControl('b_sales_manager',new FormControl('', [Validators.required]));
+      this.salesAssignForm.addControl('sales_executive',new FormControl('', [Validators.required]));
+      this.salesAssignForm.addControl('executive',new FormControl('', [Validators.required]));
+    }
+    else if(this.roleid == 2) {
+      
+      this.salesAssignForm.addControl('b_sales_manager',new FormControl('', [Validators.required]));
+      this.salesAssignForm.addControl('sales_executive',new FormControl('', [Validators.required]));
+      this.salesAssignForm.addControl('executive',new FormControl('', [Validators.required]));
+    }
+
+    this.disbursedForm = new FormGroup({
+      loan_id: new FormControl(0, Validators.required),
+      disbursed_date: new FormControl(null, Validators.required),
+      channel_payout_percent: new FormControl(0, Validators.nullValidator),
+      lender_payout_percent: new FormControl(0, Validators.nullValidator),
+      sanctioned_amount: new FormControl(0, Validators.nullValidator),
+      processing_fee: new FormControl(0, Validators.nullValidator),
+      lender_loan_id: new FormControl('', Validators.nullValidator),
+      remark: new FormControl('', Validators.nullValidator),
+      loan_status: new FormControl('', Validators.nullValidator)
     });
   }
 
@@ -85,6 +140,14 @@ export class ViewComponent implements OnInit {
     return this.f.lenders as FormArray; 
   }
   get lenderFormGroups() { return this.t.controls as FormGroup[]; }
+
+  get f1() {
+    return this.salesAssignForm.controls;
+  }
+
+  get f2() {
+    return this.disbursedForm.controls;
+  }
 
   addLender() {
     if(this.f['bank'].value!='') {
@@ -134,7 +197,9 @@ export class ViewComponent implements OnInit {
   }
 
   removeLender(index) {
+    this.lenderFormGroups[index].controls["bank_user_id"].disable();
     this.lenderFormGroups.splice(index,1);
+    
   }
 
   assignLoan(item) {
@@ -165,18 +230,20 @@ export class ViewComponent implements OnInit {
 
   saveAssign() {
     if (this.assignForm.valid) {
-      let formData:any = new FormData();
-      formData.append('loan_id',this.f["loan_id"].value);
-      formData.append('loan_status',this.f["loan_status"].value);
+      let formData:any = {
+        loan_id:this.f["loan_id"].value,
+        loan_status:this.f["loan_status"].value,
+        lenders:[],
+      };
       if(this.lenderFormGroups.length==0) {
         this.toastr.warning('Please assign Lender');
         return;
       }
       for(let i in this.lenderFormGroups){
-        formData.append('lenders[]', JSON.stringify({
+        formData.lenders.push({
           bank_id:this.lenderFormGroups[i].controls["bank_id"].value,
           bank_user_id:this.lenderFormGroups[i].controls["bank_user_id"].value
-        }));
+        });
       }
       this.loanService.assign(formData).subscribe((res)=>{
         if(res.status){
@@ -200,4 +267,143 @@ export class ViewComponent implements OnInit {
       this.toastr.error('Some field are missing');
     }
   }
+
+  async loadLenders() {
+    await this.bankService.lenders().subscribe((res)=>{
+      if(res.status){
+        this.bankList=res.data.map((a)=>{
+          return {'id':a.id,'name':a.bank_name,'lenderList':a.users};
+        });
+        console.log(this.bankList);
+      }
+      else {
+        this.bankList=[];
+      }
+    })
+  }
+
+  loadUser(role_id,id) {
+    this.userService.getchild({
+      id:id,
+      type:role_id
+    }).subscribe((res)=>{
+      if(res.status) {
+        if(role_id==1){
+          this.branchHeadList=res.data;
+        }
+        else if(role_id==2){
+          this.salesManagerList=res.data;
+        }
+        else if(role_id==3){
+          this.salesExecutiveList=res.data;
+        }
+        else if(role_id==4){
+          this.executiveList=res.data;
+        }
+      }
+    })
+  }
+
+  assignSalesPerson(item) {
+    this.displaySalesPersonAssignDialog=!this.displaySalesPersonAssignDialog;
+    if(this.displaySalesPersonAssignDialog) {
+      this.f1['loan_id'].setValue(item.id);
+      this.f1['channel_id'].setValue(item.channel_id);
+    }
+  }
+  
+  saveSalesAssign() {
+    if (this.salesAssignForm.valid) {
+      this.loanService.assignSalesPerson({
+        loan_id:this.f1["loan_id"].value,
+        executive:this.f1["executive"].value,
+        channel_id:this.f1["channel_id"].value
+      }).subscribe((res)=>{
+        if(res.status){
+          this.toastr.success(res.message);
+          this.displaySalesPersonAssignDialog=false;
+          this.loadLoan(this.table.createLazyLoadMetadata());
+        }
+        else {
+          this.toastr.error(res.message);
+        }
+      })
+    }
+    else {
+      this.toastr.error('Some field are missing');
+    }
+  }
+
+  disbursedLoan(item) {
+    this.displayLoanDisbursedDialog=!this.displayLoanDisbursedDialog;
+    if(this.displayLoanDisbursedDialog) {
+      this.disbursedForm.reset();
+      this.loanRepayDoc.clear();
+      this.channelInvoiceDoc.clear();
+      this.llcDoc.clear();
+      this.f2['loan_id'].setValue(item.id);
+      this.f2['loan_status'].setValue(item.loan_status);
+    }
+  }
+
+  onSelectFile(event){
+    //console.log(event.files);
+    //console.log(this.KYCDocs);
+    //this.KYCDocs._files.splice(1,1)
+  }
+
+  removeDocument(inpProp:FileUpload,index:number) {
+    inpProp._files.splice(index,1);
+  }
+
+  saveLoanDisbursment() {
+    if (this.disbursedForm.valid) {
+      let formData:any = new FormData();
+      formData.append('loan_id',this.f2["loan_id"].value);
+      formData.append('disbursed_date',moment(this.f2["disbursed_date"].value).format('YYYY-MM-DD'));
+      formData.append('channel_payout_percent',this.f2["channel_payout_percent"].value);
+      formData.append('lender_payout_percent',this.f2["lender_payout_percent"].value);
+      formData.append('sanctioned_amount',this.f2["sanctioned_amount"].value);
+      formData.append('processing_fee',this.f2["processing_fee"].value);
+      formData.append('lender_loan_id',this.f2["lender_loan_id"].value);
+      formData.append('loan_status',this.f2["loan_status"].value);
+      formData.append('remark',this.f2["remark"].value);
+
+      for(let i in this.loanRepayDoc._files) {
+        if(this.loanRepayDoc._files[i]['id']) continue;
+        formData.append('loan_repay_doc[]', this.loanRepayDoc._files[i]);
+      }
+
+      for(let i in this.channelInvoiceDoc._files) {
+        if(this.channelInvoiceDoc._files[i]['id']) continue;
+        formData.append('channel_invoice_doc[]', this.channelInvoiceDoc._files[i]);
+      }
+
+      for(let i in this.llcDoc._files) {
+        if(this.llcDoc._files[i]['id']) continue;
+        formData.append('llc_doc[]', this.llcDoc._files[i]);
+      }
+      this.loanService.disbursed(formData).subscribe((result: any) => {
+        if (result.status) {
+          if (result.message) {
+            this.displayLoanDisbursedDialog=false;
+            this.toastr.success(result.message);
+            this.disbursedForm.reset();
+            this.loadLoan(this.table.createLazyLoadMetadata());
+          }
+        } else {
+          this.toastr.error(result.message);
+        }
+      }, (result: any) => {
+        let message =result.message;
+        if(result.error.message) {
+          message=result.error.message
+        }
+        this.toastr.error(message);
+      });
+    } else {
+      this.toastr.error('Please fill required fields');
+    }
+  }
+  
 }

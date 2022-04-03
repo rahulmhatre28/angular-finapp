@@ -14,12 +14,14 @@ import {Router} from "@angular/router";
 import { RoleService } from '@services/role.service';
 import { UserService } from '@services/user.service';
 import { LazyLoadEvent } from 'primeng/api';
+import { BankService } from '@services/bank.service';
+import { LocationService } from '@services/location.service';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
-  providers:[RoleService,UserService]
+  providers:[RoleService,UserService, BankService, LocationService]
 })
 export class UsersComponent implements OnInit, OnDestroy {
 
@@ -34,6 +36,8 @@ export class UsersComponent implements OnInit, OnDestroy {
   representatives: any;
   selectAll: boolean = false;
   selectedCustomers:any;
+  bankList: any;
+  stateList: any;
 
   constructor(
     private renderer: Renderer2,
@@ -43,13 +47,15 @@ export class UsersComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService:AuthService,
     private roleService:RoleService,
-    private userService:UserService
+    private userService:UserService,
+    private bankService:BankService,
+    private locationService:LocationService
   ) {
   }
 
   ngOnInit() {
     this.buttons=[{
-      type:'button',class:'btn btn-info',label:'Add',icon:'fa fa-plus',disabled:false,action:'add'
+      type:'button',class:'btn btn-info',label:'Add',icon:'fa fa-plus',disabled:false,action:'add',access:'add'
     }];
     this.registerForm = new FormGroup({
       first_name: new FormControl(null, Validators.required),
@@ -65,6 +71,8 @@ export class UsersComponent implements OnInit, OnDestroy {
       branch: new FormControl(null),
     });
     this.loadRoles();
+    this.loadBanks();
+    this.loadLocation();
   }
 
   onSelectRole() {
@@ -131,7 +139,9 @@ removeValidators(controls : string[]){
   async loadRoles() {
     await this.roleService.getAll().subscribe((res)=>{
       if(res.resultKey==1){
-        this.roleList=res.resultValue;
+        this.roleList=res.resultValue.filter((a)=>{
+          return a.id!=9;
+        });
       }
       else {
         this.roleList=[];
@@ -175,6 +185,9 @@ removeValidators(controls : string[]){
         this.registerForm.controls['phone'].setValue(res.data.phone);
         this.registerForm.controls['role_id'].setValue(res.data.role_id);
         this.registerForm.controls['parent_id'].setValue(res.data.parent_id);
+        this.registerForm.controls['bank_id'].setValue(res.data.bank_id);
+        this.registerForm.controls['state_id'].setValue(res.data.state_id);
+        this.registerForm.controls['branch'].setValue(res.data.branch);
         this.registerForm.controls['password'].setValue('@@@@@@@@');
         this.registerForm.controls['confirm_password'].setValue('@@@@@@@@');
         this.selectedId = res.data.id;
@@ -205,6 +218,32 @@ removeValidators(controls : string[]){
         // })
       }
     }
+  }
+
+  loadBanks() {
+    this.bankService.list().subscribe((res)=>{
+      if(res.status){
+        this.bankList=res.data;
+      }
+      else {
+        this.bankList=[];
+      }
+    })
+  }
+
+  loadLocation() {
+    this.locationService.getByParams({
+      type:'state',
+      id:101
+    }).subscribe((res)=>{
+      if(res.status){
+        let data = res.data;
+        this.stateList = data;
+      }
+      else {
+        this.stateList=[];
+      }
+    })
   }
 
 

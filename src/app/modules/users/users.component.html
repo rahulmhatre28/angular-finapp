@@ -162,13 +162,14 @@
             </div>
             <div class="col-md-6" *ngIf="f.role_id.value==7">
                 <div class="form-group">
-                    <label for="">Bank Name</label>
-                    <input
+                    <label for="">Select Bank</label>
+                    <select
                       formControlName="bank_id"
-                      type="text"
                       class="form-control"
-                      placeholder="Select Bank"
-                    />
+                    >
+                    <option [defaultSelected]=true [value]="0">-- Select --</option>
+                    <option value="{{a.id}}" *ngFor="let a of bankList">{{a.bank_name}}</option>
+                    </select>
                     <div class="col-12" *ngIf="f.bank_id.touched && f.bank_id.invalid">
                         <small *ngIf="f.bank_id.errors?.required" class="p-error">Bank is required.</small>  
                     </div>
@@ -177,12 +178,13 @@
             <div class="col-md-6" *ngIf="f.role_id.value==7">
                 <div class="form-group">
                     <label for="">State</label>
-                    <input
+                    <select
                       formControlName="state_id"
-                      type="text"
                       class="form-control"
-                      placeholder="Select State"
-                    />
+                    >
+                    <option [defaultSelected]=true [value]="0">-- Select --</option>
+                    <option value="{{a.id}}" *ngFor="let a of stateList">{{a.name}}</option>
+                    </select>
                     <div class="col-12" *ngIf="f.state_id.touched && f.state_id.invalid">
                         <small *ngIf="f.state_id.errors?.required" class="p-error">State is required.</small>  
                     </div>

@@ -35,4 +35,8 @@ export class UserService {
         return this.dataservice.get('/user/getchild', req);
     }
 
+    getDDL(req: any=null) {
+        return this.dataservice.get('/user/ddl', req);
+    }
+
 }

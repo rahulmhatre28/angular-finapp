@@ -2,105 +2,96 @@
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <h1 class="m-0 text-dark">Dashboard</h1>
             </div>
-            <!-- /.col -->
-            <div class="col-sm-6">
+            <div class="col-sm-8">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Dashboard v1</li>
+                    <li class="breadcrumb-item">
+                        <p-dropdown [options]="userList" [(ngModel)]="form.uid" optionLabel="full_name" optionValue="id" [filter]="true" filterBy="name" [showClear]="true" placeholder="Select a User" (onChange)="loadData()" [style]="{'width':'276px'}">
+                            <ng-template let-group pTemplate="group">
+                                <div class="flex align-items-center">
+                                    <span>{{group | json}}</span>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <p-calendar [(ngModel)]="form.rangeDates" selectionMode="range" [readonlyInput]="true" inputId="range" [inputStyle]="{'width':'276px'}" (onSelect)="loadData()"></p-calendar>
+                    </li>
                 </ol>
             </div>
-            <!-- /.col -->
         </div>
-        <!-- /.row -->
     </div>
-    <!-- /.container-fluid -->
 </div>
-<!-- /.content-header -->
-
-<!-- Main content -->
 <section class="content">
     <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
         <div class="row">
             <div class="col-lg-3 col-6">
-                <!-- small box -->
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>150</h3>
-
-                        <p>Channel Users</p>
+                        <h3>{{data.users}}</h3>
+                        <p>Channels</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-bag"></i>
+                        <!-- <i class="ion ion-user"></i> -->
                     </div>
                     <a href="#" class="small-box-footer"
                         >More info <i class="fas fa-arrow-circle-right"></i
                     ></a>
                 </div>
             </div>
-            <!-- ./col -->
             <div class="col-lg-3 col-6">
-                <!-- small box -->
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{data.application}}</h3>
+                        <p>Applications</p>
+                    </div>
+                    <div class="icon">
+                        <!-- <i class="ion ion-user"></i> -->
+                    </div>
+                    <a href="#" class="small-box-footer"
+                        >More info <i class="fas fa-arrow-circle-right"></i
+                    ></a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>53<sup style="font-size: 20px">%</sup></h3>
+                        <h3>{{data.sanctioned}}</h3>
 
-                        <p>In-House Users</p>
+                        <p>Sanction</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
+                        <!-- <i class="ion ion-stats-bars"></i> -->
                     </div>
                     <a href="#" class="small-box-footer"
                         >More info <i class="fas fa-arrow-circle-right"></i
                     ></a>
                 </div>
             </div>
-            <!-- ./col -->
-            <!-- <div class="col-lg-3 col-6">
-                <div class="small-box bg-warning">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>44</h3>
+                        <h3>{{data.disbursed}}</h3>
 
-                        <p>User Registrations</p>
+                        <p>Disbursement</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-person-add"></i>
+                        <!-- <i class="ion ion-stats-bars"></i> -->
                     </div>
                     <a href="#" class="small-box-footer"
                         >More info <i class="fas fa-arrow-circle-right"></i
                     ></a>
                 </div>
-            </div> -->
-            <!-- ./col -->
-            <!-- <div class="col-lg-3 col-6">
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>65</h3>
-
-                        <p>Unique Visitors</p>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-pie-graph"></i>
-                    </div>
-                    <a href="#" class="small-box-footer"
-                        >More info <i class="fas fa-arrow-circle-right"></i
-                    ></a>
-                </div>
-            </div> -->
-            <!-- ./col -->
+            </div>
         </div>
-        <!-- /.row -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <p-chart type="bar" [data]="multiAxisData" [options]="multiAxisOptions"></p-chart>
+                    <p-chart type="bar" *ngIf="multiAxisData.datasets.length>0" [(data)]="multiAxisData" [options]="multiAxisOptions"></p-chart>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Main row -->
 </section>
-<!-- /.content -->

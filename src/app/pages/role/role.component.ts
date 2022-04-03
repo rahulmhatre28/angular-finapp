@@ -31,9 +31,9 @@ export class RoleComponent implements OnInit {
   
   ngOnInit(): void {
     this.buttons=[{
-      type:'submit',class:'btn btn-primary',label:'Submit',icon:'fa fa-save',disabled:true,action:'save'
+      type:'submit',class:'btn btn-primary',label:'Submit',icon:'fa fa-save',disabled:true,action:'save',access:'add'
     },{
-      type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset'
+      type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset',access:'add'
     }];
     this.loadRoles();
     this.fetchMenu();
