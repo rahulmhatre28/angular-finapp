@@ -1,0 +1,47 @@
+<app-breadcrumb [buttons]="[]"></app-breadcrumb>
+<div class="row justify-content-center">
+    <div class="col-md-6 pt-4">
+        <div class="card">
+            <div class="card-body">
+                <form [formGroup]="form" (ngSubmit)="submit()">
+                    <div class="form-group">
+                        <label for="">Upload file</label>
+                        <input type="file" class="form-control" formControlName="fileInput" (change)="onFileChange($event)" required>
+                        <small class="text-danger">Allow .csv extension file only.</small>
+                    </div>
+                    <div *ngIf="f.fileInput.touched && f.fileInput.invalid" class="alert alert-danger">
+                        <div *ngIf="f.fileInput.errors.required">File is required.</div>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="reset" class="btn btn-danger mr-2" [disabled]="loading">Clear</button>
+                        <button class="btn btn-primary" [disabled]="loading">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card" *ngIf="batches.length>0">
+            <div class="card-body">
+                <table class="table table-bordered">
+                   <thead>
+                       <tr>
+                           <th>Total Jobs</th>
+                           <th>Pending Jobs</th>
+                           <th>In Progress</th>
+                           <th>Failed</th>
+                           <th>Created At</th>
+                           <th>Finished At</th>
+                       </tr>
+                       <tr *ngFor="let a of batches">
+                            <td>{{a.totalJobs}}</td>
+                            <td>{{a.pendingJobs}}</td>
+                            <td>{{a.progress}}</td>
+                            <td>{{a.failedJobs}}</td>
+                            <td>{{a.createdAt | date : 'd-M-y h:mm:ss a}}</td>
+                            <td>{{a.finishedAt | date : 'd-M-y h:mm:ss a}}</td>
+                       </tr>
+                   </thead> 
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

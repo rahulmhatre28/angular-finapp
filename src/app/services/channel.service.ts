@@ -39,4 +39,12 @@ export class ChannelService {
         return this.dataservice.delete('/channel/'+id);
     }
 
+    borrowerDropdown(req: any=null) {
+        return this.dataservice.get('/channel/borrowerdropdown', req);
+    }
+
+    banks(req: any=null) {
+        return this.dataservice.get('/channel/banks', req);
+    }
+
 }

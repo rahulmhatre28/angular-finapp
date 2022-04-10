@@ -76,12 +76,12 @@ const routes: Routes = [
                 loadChildren: () => import('./modules/loan/loan.module').then(m => m.LoanModule) 
             },
             { 
-                path: 'Admin/upload', 
-                loadChildren: () => import('./modules/upload/upload.module').then(m => m.UploadModule) 
+                path: 'Admin/reports', 
+                loadChildren: () => import('./modules/reports/reports.module').then(m => m.ReportsModule) 
             },
             { 
-                path: 'Admin/report', 
-                loadChildren: () => import('./modules/report/report.module').then(m => m.ReportModule) 
+                path: 'Admin/payment', 
+                loadChildren: () => import('./modules/payment/payment.module').then(m => m.PaymentModule) 
             },
             {
                 path: 'users',

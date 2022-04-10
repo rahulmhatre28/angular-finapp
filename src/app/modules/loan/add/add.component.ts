@@ -65,6 +65,7 @@ export class AddComponent implements OnInit, OnDestroy {
   executiveList: any=[];
   branchHeadList: any=[];
   doc_path:String='';
+  borrowerList: any;
 
   constructor(
     private renderer: Renderer2,
@@ -95,7 +96,9 @@ export class AddComponent implements OnInit, OnDestroy {
     }];
     this.roleid = this.globalService.getUser.role_id;
     this.loanForm = new FormGroup({
+      loan_through: new FormControl('', Validators.required),
       channel_id: new FormControl(null, Validators.nullValidator),
+      borrower_id: new FormControl(null, Validators.nullValidator),
       loan_option_type: new FormControl(0, Validators.nullValidator),
       loan_type: new FormControl(0, Validators.nullValidator),
       loan_other_type: new FormControl(0, Validators.nullValidator),
@@ -157,7 +160,7 @@ export class AddComponent implements OnInit, OnDestroy {
     }
     else if(this.roleid == 9) {
   
-      this.loanForm.addControl('executive',new FormControl(0, [Validators.nullValidator]));
+      this.loanForm.addControl('executive',new FormControl(this.globalService.getUser.parent_id, [Validators.nullValidator]));
     }
 
     this.loadUser(this.roleid,this.globalService.getUser.id);
@@ -169,10 +172,12 @@ export class AddComponent implements OnInit, OnDestroy {
     if(this.route.snapshot.paramMap.has('channelid')){
       let id: any = this.route.snapshot.paramMap.get('channelid');
       this.f['channel_id'].setValue(id);
+      this.f['loan_through'].setValue(1);
       this.through_channel=true;
     } else if(this.roleid==9){
       let id: any = this.globalService.getUser.id;
       this.f['channel_id'].setValue(id);
+      this.f['loan_through'].setValue(1);
       this.through_channel=true;
     }
   }
@@ -235,6 +240,8 @@ export class AddComponent implements OnInit, OnDestroy {
   async save() {
     if (this.loanForm.valid) {
       let formData:any = new FormData();
+      formData.append('loan_through',this.f["loan_through"].value);
+      formData.append('borrower_id',this.f["borrower_id"].value);
       formData.append('channel_id',this.f["channel_id"].value);
       formData.append('loan_option_type',this.f["loan_option_type"].value);
       formData.append('loan_type',this.f["loan_type"].value);
@@ -335,6 +342,8 @@ export class AddComponent implements OnInit, OnDestroy {
       id:id
     }).subscribe((res)=>{
       if(res.status) {
+        this.loanForm.controls['loan_through'].setValue(res.data.loan_through);
+        this.loanForm.controls['borrower_id'].setValue(res.data.borrower_id);
         this.loanForm.controls['channel_id'].setValue(res.data.channel_id);
         this.loanForm.controls['loan_option_type'].setValue(res.data.loan_option_type);
         this.loanForm.controls['loan_type'].setValue(res.data.loan_type);
@@ -372,6 +381,7 @@ export class AddComponent implements OnInit, OnDestroy {
         if(executive_list!=null) {
           this.loanForm.controls['executive'].setValue(executive_list.id);
           this.loadChannel();
+          this.loadBorrower();
           if(this.loanForm.controls['sales_executive']) {
             this.loanForm.controls['sales_executive'].setValue(executive_list.parent.id);
             this.loadUser(4,executive_list.parent.id);
@@ -527,12 +537,35 @@ export class AddComponent implements OnInit, OnDestroy {
     inpProp._files.splice(index,1);
   }
 
+  loadPartner() {
+    this.f['channel_id'].setValue(null);
+    this.f['borrower_id'].setValue(null);
+    if(this.f['loan_through'].value==1) {
+      this.loadChannel();
+    }
+    else if(this.f['loan_through'].value==2) {
+      this.loadBorrower();
+    }
+  }
+
   loadChannel() {
+    if(this.f['executive'].value== '') return;
     this.channelService.dropdown({
       id: this.f['executive'].value
     }).subscribe((res)=>{
       if(res.status){
         this.channelList=res.data;
+      }
+    })
+  }
+
+  loadBorrower() {
+    if(this.f['executive'].value== '') return;
+    this.channelService.borrowerDropdown({
+      id: this.f['executive'].value
+    }).subscribe((res)=>{
+      if(res.status){
+        this.borrowerList=res.data;
       }
     })
   }

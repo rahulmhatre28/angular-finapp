@@ -39,7 +39,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4" *ngIf="roleid==5">
+                <div class="col-md-4" *ngIf="roleid==5 || roleid==9">
                     <input type="hidden" formControlName="executive">
                 </div>
             </div>
@@ -203,9 +203,9 @@
                                           class="form-control"
                                         >
                                             <option value="null">Select Account Type</option>
-                                            <option value="'Current'">Current</option>
-                                            <option value="'Saving'">Saving</option>
-                                            <option value="'Salaried'">Salaried</option>
+                                            <option [value]="'Current'">Current</option>
+                                            <option [value]="'Saving'">Saving</option>
+                                            <option [value]="'Salaried'">Salaried</option>
                                         </select>
                                         <div class="col-12" *ngIf="detail.controls.accounttype.touched && detail.controls.accounttype.invalid">
                                             <small *ngIf="detail.controls.accounttype.errors?.required" class="p-error">Account Type is required.</small>

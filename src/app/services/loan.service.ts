@@ -46,4 +46,12 @@ export class LoanService {
         return this.dataservice.postFile('/loan/disbursed', req);
     }
 
+    getDisbursedDetails(req:any) {
+        return this.dataservice.get('/loan/disbursed/'+req.id,req);
+    }
+
+    report(req:any=null) {
+        return this.dataservice.get('/report',req);
+    }
+
 }

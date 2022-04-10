@@ -139,9 +139,10 @@ removeValidators(controls : string[]){
   async loadRoles() {
     await this.roleService.getAll().subscribe((res)=>{
       if(res.resultKey==1){
-        this.roleList=res.resultValue.filter((a)=>{
-          return a.id!=9;
-        });
+        // this.roleList=res.resultValue.filter((a)=>{
+        //   return a.id!=9;
+        // });
+        this.roleList = res.resultValue;
       }
       else {
         this.roleList=[];

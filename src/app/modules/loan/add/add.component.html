@@ -4,6 +4,27 @@
         <form [formGroup]="loanForm" (ngSubmit)="!loanForm.invalid">
             <p-tabView>
                 <p-tabPanel header="Loan Details" >
+                    <div class="row">
+                        <div class="col-md-4" *ngIf="roleid!=9">
+                            <div class="form-group">
+                                <label for="">Loan through</label>
+                                <select formControlName="loan_through" class="form-control" (change)="loadPartner()">
+                                    <option value="">-- Select --</option>
+                                    <option value="1">Channel</option>
+                                    <option value="2">Borrower</option>
+                                    <option value="3">In House</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.loan_through.touched && f.loan_through.invalid">
+                                    <small *ngIf="f.loan_through.errors?.required" class="p-error">Loan through is required.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4" *ngIf="roleid==9">
+                            <input type="hidden" formControlName="loan_through" value="1">
+                            <input type="hidden" formControlName="executive">
+                        </div>
+                    </div>
+
                     <div class="row" *ngIf="!through_channel">
                         <div class="col-md-4" *ngIf="roleid<=1">
                             <div class="form-group">
@@ -35,17 +56,17 @@
                         <div class="col-md-4" *ngIf="roleid<=4">
                             <div class="form-group">
                                 <label for="">Select Executive</label>
-                                <select formControlName="executive" class="form-control" (change)="loadChannel()">
+                                <select formControlName="executive" class="form-control" (change)="loadPartner()">
                                     <option value="">-- Select --</option>
                                     <option value="{{user.id}}" *ngFor="let user of executiveList">{{user.full_name}}</option>
                                 </select>
                             </div>
                         </div>
-                        <div *ngIf="roleid==5">
+                        <div *ngIf="roleid==5"> 
                             <input type="hidden" formControlName="executive">
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
+                        <div class="col-md-4" *ngIf="f.loan_through.value==1 || f.loan_through.value==2">
+                            <div class="form-group" *ngIf="f.loan_through.value==1">
                                 <label for="">Select Channel</label>
                                 <select formControlName="channel_id" class="form-control">
                                      <option value="null">-- Select --</option>
@@ -53,6 +74,16 @@
                                 </select>
                                 <div class="col-12" *ngIf="f.channel_id.touched && f.channel_id.invalid">
                                     <small *ngIf="f.channel_id.errors?.required" class="p-error">Channel is required.</small>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="f.loan_through.value==2">
+                                <label for="">Select Borrower</label>
+                                <select formControlName="borrower_id" class="form-control">
+                                     <option value="null">-- Select --</option>
+                                     <option value="{{a.id}}" *ngFor="let a of borrowerList">{{a.full_name}}</option>
+                                </select>
+                                <div class="col-12" *ngIf="f.borrower_id.touched && f.borrower_id.invalid">
+                                    <small *ngIf="f.borrower_id.errors?.required" class="p-error">Borrower is required.</small>
                                 </div>
                             </div>
                         </div>

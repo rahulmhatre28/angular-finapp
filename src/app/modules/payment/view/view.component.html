@@ -1,0 +1,115 @@
+<app-breadcrumb [buttons]="buttons" (onAction)="buttonClick($event)"></app-breadcrumb>
+<p-table [value]="dataList" [lazy]="true" (onLazyLoad)="loadData($event)" responsiveLayout="scroll" dataKey="id"
+    [selection]="selectedCustomers" [selectAll]="selectAll"
+    [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading" [globalFilterFields]="['name','country.name', 'company', 'representative.name']">
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 100px;">Action</th>
+            <th pSortableColumn="ref_no">Loan Ref. No. <p-sortIcon field="ref_no"></p-sortIcon></th>
+            <th pSortableColumn="business_name">Business Name <p-sortIcon field="business_name"></p-sortIcon></th>
+            <th pSortableColumn="product.value">Product <p-sortIcon field="product.value"></p-sortIcon></th>
+            <th pSortableColumn="loan_amount">Loan Amount <p-sortIcon field="loan_amount"></p-sortIcon></th>
+            <th pSortableColumn="sanctioned_amount">Disbursement Amount <p-sortIcon field="sanctioned_amount"></p-sortIcon></th>
+            <th pSortableColumn="disbursed_at">Disbursement Date <p-sortIcon field="disbursed_at"></p-sortIcon></th>
+            <th pSortableColumn="payment_status">Payment Status <p-sortIcon field="payment_status"></p-sortIcon></th>
+        </tr>
+        <tr>
+            <th style="width: 100px;">
+            </th>
+            <th><p-columnFilter type="text" field="ref_no"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="business_name"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="product.value"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="loan_amount"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="sanctioned_amount"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="disbursed_at"></p-columnFilter></th>
+            <th><p-columnFilter type="text" field="payment_status"></p-columnFilter></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-loan>
+        <tr>
+            <td>
+                <button class="btn btn-primary btn-xs mr-1" (click)="manage(loan)" title="Channel Invoicing" *ngIf="loan.payment_initiated!=2"><i class="fa fa-edit"></i></button>
+                <button class="btn btn-info btn-xs mr-1" (click)="viewPaymentDetails(loan)" title="View Payment Details"><i class="fa fa-eye"></i></button>
+            </td>
+            <td>{{loan.ref_no}}</td>
+            <td>{{loan.business_name}}</td>
+            <td>{{loan.product.value}}</td>
+            <td>{{loan.loan_amount}}</td>
+            <td>{{loan.sanctioned_amount}}</td>
+            <td>{{loan.disbursed_at | date : 'd-M-y h:mm:ss a'}}</td>
+            <td>
+                <span class="badge alert-info" *ngIf="loan.payment_initiated==1">Payment Initiated</span>
+                <span class="badge alert-success" *ngIf="loan.payment_initiated==2">Payment Approved</span>
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+
+<p-dialog header="Channel Invoicing" [(visible)]="displayChannelInvoiceDialog" [style]="{width: '40vw'}">
+    <form [formGroup]="paymentForm" (ngSubmit)="paymentForm.valid && submitPayment()">
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <div class="form-group">
+                    <label for="">Payment Status</label>
+                    <select class="form-control" formControlName="payment_status">
+                        <option value="">-- Select --</option>
+                        <option value="1">Payment Initiate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Bank List</label>
+                    <select class="form-control" formControlName="bank_id">
+                        <option value="">-- Select --</option>
+                        <option [value]="a.id" *ngFor="let a of bankList">{{a.bank}} {{a.branch_name}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Note</label>
+                    <textarea class="form-control" formControlName="note"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <input type="hidden" formControlName="loan_id">
+                <input type="hidden" formControlName="channel_id">
+                <input type="hidden" formControlName="borrower_id">
+                <button class="btn btn-primary" [disabled]="paymentForm.invalid">Save</button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-dialog header="Payment Details" [(visible)]="displayPaymentDetailDialog" [style]="{width: '60vw'}">
+    <div class="row">
+        <div class="col-md-12 mt-3">
+            <table class="table table-bordered">
+            <tr>
+                <th>Disbursement Amount</th>
+                <th>Channel Payment Percentage</th>
+                <th>Payable Amount</th>
+                <th>Net Amount</th>
+                <th>Tax</th>
+                <th>Net Payable</th>
+                <th>Approved On</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td>{{paymentData.disbursement_amount}}</td>
+                <td>{{paymentData.channel_payout_percent}}</td>
+                <td>{{paymentData.payable_amount}}</td>
+                <td>{{paymentData.net_amount}}</td>
+                <td>{{paymentData.tax}}</td>
+                <td>{{paymentData.net_payable}}</td>
+                <td>{{paymentData.approved_on}}</td>
+                <td>
+                    <button class="btn btn-primary" [disabled]="paymentData.approved==1" (click)="approvePayment(paymentData)">
+                        Approve
+                    </button>
+                </td>
+            </tr>
+            </table>
+        </div>
+    </div>
+</p-dialog>

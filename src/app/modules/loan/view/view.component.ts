@@ -67,6 +67,7 @@ export class ViewComponent implements OnInit {
   @ViewChild('loanRepayDoc') loanRepayDoc : FileUpload;
   @ViewChild('channelInvoiceDoc') channelInvoiceDoc : FileUpload;
   @ViewChild('llcDoc') llcDoc : FileUpload;
+  remarkList: any=[];
 
 
   constructor(private loanService:LoanService,private router:Router, private formBuilder: FormBuilder,private toastr: ToastrService,private activatedRoute:ActivatedRoute, private bankService:BankService,public global:GlobalService,private userService:UserService) { }
@@ -341,8 +342,25 @@ export class ViewComponent implements OnInit {
       this.loanRepayDoc.clear();
       this.channelInvoiceDoc.clear();
       this.llcDoc.clear();
-      this.f2['loan_id'].setValue(item.id);
-      this.f2['loan_status'].setValue(item.loan_status);
+
+      this.loanService.getDisbursedDetails({
+        id:item.id
+      }).subscribe((res)=>{
+        if(res.status) {
+          let data = res.data;
+          this.f2['loan_id'].setValue(data.id);
+          this.f2['loan_status'].setValue(data.loan_status);
+          if(data.disbursed_at!=null) {
+            this.f2['disbursed_date'].setValue(moment(data.disbursed_at).toDate());
+          }
+          this.f2['channel_payout_percent'].setValue(data.channel_payout_percent);
+          this.f2['lender_payout_percent'].setValue(data.lender_payout_percent);
+          this.f2['sanctioned_amount'].setValue(data.sanctioned_amount);
+          this.f2['processing_fee'].setValue(data.processing_fee);
+          this.f2['lender_loan_id'].setValue(data.lender_loan_id);
+          this.remarkList = data.remarks;
+        }
+      })
     }
   }
 

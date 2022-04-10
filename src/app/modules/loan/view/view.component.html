@@ -32,7 +32,7 @@
             <td style="width: 140px;">
                 <button class="btn btn-primary btn-xs mr-1" (click)="edit(loan)" title="Edit Loan" *ngIf="pagetype!='disbursed'"><i class="fa fa-edit"></i></button>
                 <a class="btn btn-info btn-xs mr-1" title="View Loan" [href]="'#/Admin/loan/view/'+loan.id" target="_blank"><i class="fa fa-eye"></i></a>
-                <button class="btn btn-success btn-xs mr-1" title="Change Sales Person"  (click)="assignSalesPerson(loan)" *ngIf="pagetype!='disbursed'"><i class="fa fa-user"></i></button>
+                <button class="btn btn-success btn-xs mr-1" title="Change Sales Person"  (click)="assignSalesPerson(loan)" *ngIf="pagetype!='disbursed' && roleid<5"><i class="fa fa-user"></i></button>
                 <button class="btn btn-warning btn-xs text-white mr-1" title="Assign Lender" (click)="assignLoan(loan)" *ngIf="pagetype!='disbursed'"><strong>L</strong></button>
                 <button class="btn btn-danger btn-xs text-white" title="Disbursed" (click)="disbursedLoan(loan)" *ngIf="pagetype!='application'"><strong>D</strong></button>
             </td>
@@ -57,7 +57,7 @@
 <p-dialog header="Loan Assignment" [(visible)]="displayLoanAssignDialog" [style]="{width: '40vw'}">
     <form [formGroup]="assignForm" (ngSubmit)="!assignForm.invalid && saveAssign()">
     <div class="row" style="max-height:80vh">
-        <div class="col-md-12">
+        <div class="col-md-12 mt-3">
             <div class="form-group">
                 <label for="">Select Loan Status</label>
                 <select formControlName="loan_status" class="form-control" required>
@@ -321,6 +321,13 @@
                             <label for="">Remark</label>
                             <textarea class="form-control" formControlName="remark"></textarea>
                         </div>
+                        <ul class="list-group">
+                            <li class="list-group-item" *ngFor="let a of remarkList">
+                                <p>{{a.remark}}</p>
+                                <p>{{a.created_at | date:'d-M-y h:mm:ss a'}}</p>
+                                <p>{{a.user.full_name}}</p>
+                            </li>
+                        </ul>
                     </div>
                     <div class="col-md-12">
                         <p-divider></p-divider>

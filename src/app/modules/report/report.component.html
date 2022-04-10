@@ -1,0 +1,126 @@
+<app-breadcrumb [buttons]="[]"></app-breadcrumb>
+<div class="row pl-4 pr-4">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Report Type</label>
+            <select class="form-control" [(ngModel)]="form.type" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="units">Units</option>
+                <option value="gross_in_cr">Gross Amount</option>
+                <option value="interest_in_cr">Interest Amount</option>
+                <option value="net_in_cr">Net Amount</option>
+                <option value="wirr">WIRR</option>
+                <option value="process_fee">Processing Fee %</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Product</label>
+            <select class="form-control" [(ngModel)]="form.product" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="{{a.product}}" *ngFor="let a of dropdown.product">{{a.product}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">State</label>
+            <select class="form-control" [(ngModel)]="form.state" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="{{a.state}}" *ngFor="let a of dropdown.state">{{a.state}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Hub</label>
+            <select class="form-control" [(ngModel)]="form.hub" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="{{a.hub}}" *ngFor="let a of dropdown.hub">{{a.hub}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Profile</label>
+            <select class="form-control" [(ngModel)]="form.profile" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="{{a.profile}}" *ngFor="let a of dropdown.profile">{{a.profile}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Company Category</label>
+            <select class="form-control" [(ngModel)]="form.company_category" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="{{a.company_category}}" *ngFor="let a of dropdown.company_category">{{a.company_category}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Segment</label>
+            <select class="form-control" [(ngModel)]="form.seg_gov_flag" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="Y">Yes</option>
+                <option value="N">No</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Market</label>
+            <select class="form-control" [(ngModel)]="form.market" (change)="loanReport()">
+                <option value="">All</option>
+                <option value="{{a.market}}" *ngFor="let a of dropdown.market">{{a.market}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Month</label>
+            <p-multiSelect [options]="monthList" [(ngModel)]="form.month" optionValue="name" optionLabel="name" (onChange)="loanReport()" [style]="{'width':'100%'}" placeholder="Select month"></p-multiSelect>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="">Date range</label>
+            <p-calendar [(ngModel)]="form.date1" selectionMode="range" [readonlyInput]="true" inputId="range" (onSelect)="loanReport()" [style]="{'width':'100%'}"></p-calendar>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body" style="overflow-x: auto;">
+                <table class="ctable" style="border-collapse: collapse">
+                    <tr style="position: sticky;top:-1px;">
+                        <th style="width:200px" class="text-center" style="background-color: #dddddd;">State</th>
+                        <th style="width:1000px">
+                            <table class="ctable childtable" style="border:0;border-collapse: collapse">
+                                <tr>
+                                    <th *ngFor="let key1 of header" style="width: 100px;">{{key1.month}}</th>
+                                </tr>
+                            </table>
+                        </th>
+                    </tr>
+                    <tr *ngFor="let item of reportData" rowspan="4">
+                        <td style="width:200px" class="text-center">{{item.state}}</td>
+                        <td class="p-0"style="width:1000px">
+                            <table class="ctable childtable" style="border:0;border-collapse: collapse">
+                                <tr *ngFor="let otherItem of item.data;let i=index">
+                                    <td [ngStyle]="{'width':'100px'}" *ngFor="let key of header">{{otherItem[key.month]}}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr *ngIf="reportData.length==0">
+                        <td colspan="2" class="text-center">No Record available</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

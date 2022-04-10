@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  api_php_public: 'http://localhost:9000/public',
+  api_php_public: 'http://localhost:9000',
   api_php: 'http://localhost:9000',
   front_end_url: 'http://localhost:5000'
 };

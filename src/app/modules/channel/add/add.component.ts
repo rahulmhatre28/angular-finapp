@@ -62,7 +62,9 @@ export class AddComponent implements OnInit, OnDestroy {
       type:'button',class:'btn btn-danger',label:'Reset',icon:'fa fa-reload',disabled:false,action:'reset',hidden:false,access:'add'
     },{
       type:'button',class:'btn btn-info',label:'Save',icon:'fa fa-save',disabled:false,action:'save',hidden:false,access:'add'
-    }];
+    },{
+      type:'button',class:'btn btn-info',label:'Save',icon:'fa fa-save',disabled:false,action:'save',hidden:true,access:'edit'
+    },];
     this.registerForm = new FormGroup({
       name: new FormControl(null, Validators.required),
       phone: new FormControl(null, Validators.required),
@@ -106,6 +108,7 @@ export class AddComponent implements OnInit, OnDestroy {
       this.edit(id);
     }
     else if(this.roleid==9 && this.pagetype=='profile') {
+      this.buttons[3].hidden = false;
       this.edit(this.globalService.getUser.id); 
     }
   }
@@ -146,7 +149,6 @@ export class AddComponent implements OnInit, OnDestroy {
           if (result.message) {
             this.display=false;
             this.toastr.success(result.message);
-            this.router.navigate(['/']);
           }
         } else {
           this.errorHandler.basicHandler(result);
@@ -192,15 +194,33 @@ export class AddComponent implements OnInit, OnDestroy {
         this.registerForm.controls['pan'].setValue(res.data.pan);
         this.registerForm.controls['pincode'].setValue(res.data.pincode);
         this.registerForm.controls['gst'].setValue(res.data.gst);
-
-        for(let bank of res.data.banks) {
-          this.t.push(this.formBuilder.group({
-            bank: new FormControl(bank.bank, [Validators.required]),    
-            branchname: new FormControl(bank.branchname, [Validators.required]),    
-            accountno: new FormControl(bank.accountno, [Validators.required]),    
-            accounttype: new FormControl(bank.accounttype, [Validators.required]),    
-            ifsccode: new FormControl(bank.ifsccode, [Validators.required])
-          }));
+        let executive_list = res.data.executive_list;
+        if(executive_list!=null) {
+          this.registerForm.controls['executive'].setValue(executive_list.id);
+          if(this.registerForm.controls['sales_executive']) {
+            this.registerForm.controls['sales_executive'].setValue(executive_list.parent.id);
+            this.loadUser(4,executive_list.parent.id);
+          }
+          if(this.registerForm.controls['b_sales_manager']) {
+            this.registerForm.controls['b_sales_manager'].setValue(executive_list.parent.parent.id);
+            this.loadUser(3,executive_list.parent.parent.id);
+          }
+          if(this.registerForm.controls['b_head']) {
+            this.registerForm.controls['b_head'].setValue(executive_list.parent.parent.parent.id);   
+            this.loadUser(2,executive_list.parent.parent.parent.id);
+          } 
+        }
+        if(this.roleid==9) {
+          this.registerForm.controls['executive'].setValue(res.data.executive);
+          for(let bank of res.data.banks) {
+            this.t.push(this.formBuilder.group({
+              bank: new FormControl(bank.bank, [Validators.required]),    
+              branchname: new FormControl(bank.branchname, [Validators.required]),    
+              accountno: new FormControl(bank.accountno, [Validators.required]),    
+              accounttype: new FormControl(bank.accounttype, [Validators.required]),    
+              ifsccode: new FormControl(bank.ifsccode, [Validators.required])
+            }));
+          }
         }
         this.selectedId = res.data.id;
       }
